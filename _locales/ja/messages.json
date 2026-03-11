@@ -1,0 +1,42 @@
+{
+   "extensionDescription": {
+      "description": "Extension description",
+      "message": "YouTubeが再生するビデオとオーディオのコーデックを選択します"
+   },
+   "optionsBlock60fps": {
+      "message": "60fpsのビデオをブロック"
+   },
+   "optionsEnable": {
+      "message": "YT Liteを有効にする"
+   },
+   "optionsBlockAV1": {
+      "message": "AV1をブロック"
+   },
+   "optionsBlockH264": {
+      "message": "h264 (AVC)をブロック"
+   },
+   "optionsBlockMP4A": {
+      "message": "AAC (MP4A)をブロック"
+   },
+   "optionsBlockOpus": {
+      "message": "Opusをブロック"
+   },
+   "optionsBlockVP8": {
+      "message": "VP8をブロック"
+   },
+   "optionsBlockVP9": {
+      "message": "VP9をブロック"
+   },
+   "optionsDisableLN": {
+      "message": "ラウドネスノーマライゼーションを無効にする"
+   },
+   "optionsTitle": {
+      "message": "YT Lite ▶🚀"
+   },
+   "optionsTitleAudio": {
+      "message": "オーディオ"
+   },
+   "optionsTitleVideo": {
+      "message": "ビデオ"
+   }
+}

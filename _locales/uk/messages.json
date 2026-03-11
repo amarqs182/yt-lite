@@ -1,0 +1,42 @@
+{
+   "extensionDescription": {
+      "description": "Extension description",
+      "message": "Вибирайте самі відео та аудіо кодеки, які YouTube буде вам показувати"
+   },
+   "optionsBlock60fps": {
+      "message": "Блокувати 60к/с відео"
+   },
+   "optionsEnable": {
+      "message": "Увімкнути YT Lite"
+   },
+   "optionsBlockAV1": {
+      "message": "Блокувати AV1"
+   },
+   "optionsBlockH264": {
+      "message": "Блокувати h264 (AVC)"
+   },
+   "optionsBlockMP4A": {
+      "message": "Блокувати AAC (MP4A)"
+   },
+   "optionsBlockOpus": {
+      "message": "Блокувати Opus"
+   },
+   "optionsBlockVP8": {
+      "message": "Блокувати VP8"
+   },
+   "optionsBlockVP9": {
+      "message": "Блокувати VP9"
+   },
+   "optionsDisableLN": {
+      "message": "Вимкнути нормалізацію гучності"
+   },
+   "optionsTitle": {
+      "message": "YT Lite ▶🚀"
+   },
+   "optionsTitleAudio": {
+      "message": "Аудіо"
+   },
+   "optionsTitleVideo": {
+      "message": "Відео"
+   }
+}

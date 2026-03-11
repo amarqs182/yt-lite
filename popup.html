@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <title>▶ ytライト</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+        /* === M3 Design Tokens (Dark Scheme) === */
+        :root {
+            --md-sys-color-surface:             #1C1B1F;
+            --md-sys-color-surface-container:   #211F26;
+            --md-sys-color-surface-container-high: #2B2930;
+            --md-sys-color-on-surface:          #E6E1E5;
+            --md-sys-color-on-surface-variant:  #CAC4D0;
+            --md-sys-color-primary:             #A5D6A7; /* Verde Pastel */
+            --md-sys-color-on-primary:          #0A3D12;
+            --md-sys-color-primary-container:   #1E4023;
+            --md-sys-color-secondary:           #80DEEA; /* Teal Pastel */
+            --md-sys-color-tertiary:            #FFD54F; /* Amber for warnings */
+            --md-sys-color-error:               #F2B8B8;
+            --md-sys-color-outline:             #938F99;
+            --md-sys-color-outline-variant:     #49454F;
+            --md-sys-color-inverse-surface:     #E6E1E5;
+
+            --md-ref-typeface-brand:   'Roboto', system-ui, sans-serif;
+            --md-ref-typeface-plain:   'Roboto', system-ui, sans-serif;
+            --md-ref-typeface-mono:    'Roboto Mono', 'Cascadia Code', monospace;
+        }
+
+        :root[data-theme="amoled"] {
+            --md-sys-color-surface:             #000000;
+            --md-sys-color-surface-container:   #090909;
+            --md-sys-color-surface-container-high: #121212;
+            --md-sys-color-on-surface:          #FFFFFF;
+        }
+
+        :root[data-theme="light"] {
+            --md-sys-color-surface:             #FDFDF5;
+            --md-sys-color-surface-container:   #F4EFE6;
+            --md-sys-color-surface-container-high: #EBE5DB;
+            --md-sys-color-on-surface:          #1A1C19;
+            --md-sys-color-on-surface-variant:  #43483E;
+            --md-sys-color-primary:             #386A20;
+            --md-sys-color-on-primary:          #FFFFFF;
+            --md-sys-color-primary-container:   #B7F397;
+            --md-sys-color-outline:             #74796D;
+            --md-sys-color-outline-variant:     #C3C8BB;
+            --md-sys-color-inverse-surface:     #2F312D;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            width: 380px;
+            max-height: 580px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            font-family: var(--md-ref-typeface-brand);
+            font-size: 14px;
+        }
+
+        /* === TOP APP BAR (M3) === */
+        .top-app-bar {
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            height: 56px;
+            background: var(--md-sys-color-surface-container);
+            flex-shrink: 0;
+            gap: 4px;
+        }
+        .icon-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            background: none; border: none; color: var(--md-sys-color-on-surface);
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+        .icon-btn:hover { background: rgba(230,225,229,0.08); }
+        .top-app-bar-title {
+            font-size: 18px; font-weight: 500;
+            flex: 1;
+            padding: 0 8px 0 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        #theme_selector {
+            margin-right: 12px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: var(--md-sys-color-surface-container-high);
+            color: var(--md-sys-color-on-surface);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            font-family: inherit;
+            cursor: pointer;
+            font-size: 12px;
+            outline: none;
+        }
+
+        /* === SCROLL AREA === */
+        .scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+            padding-bottom: 4px;
+        }
+
+        /* === SECTION HEADER === */
+        .section-header {
+            display: flex; align-items: center; gap: 10px;
+            padding: 16px 16px 8px;
+        }
+        .section-header-icon { font-size: 20px; }
+        .section-header-text {
+            font-size: 16px; font-weight: 500;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        /* === FEATURE LIST (M3 Cards) === */
+        .feature-list {
+            display: flex; flex-direction: column;
+            gap: 4px; padding: 0 12px;
+        }
+
+        .feature-card {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--md-sys-color-surface-container);
+            border-radius: 12px;
+            padding: 10px 12px;
+            transition: background 0.15s;
+            cursor: default;
+            border: 1px solid transparent;
+        }
+        .feature-card:hover { background: var(--md-sys-color-surface-container-high); }
+        .feature-card.experimental {
+            border-color: color-mix(in srgb, var(--md-sys-color-tertiary) 30%, transparent);
+        }
+
+        .feature-icon {
+            font-size: 20px; width: 28px; text-align: center; flex-shrink: 0;
+        }
+        .feature-text { flex: 1; min-width: 0; }
+        .feature-label {
+            font-size: 13px; font-weight: 500;
+            color: var(--md-sys-color-on-surface);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .feature-desc {
+            font-size: 11px;
+            color: var(--md-sys-color-on-surface-variant);
+            margin-top: 1px;
+        }
+        .warn-badge {
+            font-size: 10px;
+            color: var(--md-sys-color-tertiary);
+            margin-left: 4px;
+        }
+
+        /* === M3 SWITCH === */
+        .m3-switch { position: relative; flex-shrink: 0; }
+        .m3-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .m3-track {
+            display: block;
+            width: 44px; height: 24px;
+            border-radius: 12px;
+            background: var(--md-sys-color-surface-container-high);
+            border: 2px solid var(--md-sys-color-outline);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .m3-thumb {
+            position: absolute;
+            top: 50%; left: 3px;
+            transform: translateY(-50%);
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: var(--md-sys-color-outline);
+            transition: left 0.2s, width 0.15s, height 0.15s, background 0.2s, box-shadow 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; color: transparent;
+        }
+        /* Checked state */
+        .m3-switch input:checked + .m3-track {
+            background: var(--md-sys-color-primary);
+            border-color: var(--md-sys-color-primary);
+        }
+        .m3-switch input:checked + .m3-track .m3-thumb {
+            left: calc(100% - 28px);
+            width: 24px; height: 24px;
+            background: var(--md-sys-color-on-primary);
+            color: var(--md-sys-color-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+        /* Hover ripple */
+        .m3-track:hover::after {
+            content: '';
+            position: absolute; inset: -8px;
+            border-radius: 50%;
+        }
+
+        /* === M3 DIVIDER === */
+        .m3-divider {
+            height: 1px;
+            background: var(--md-sys-color-outline-variant);
+            margin: 12px 16px;
+        }
+
+        /* === TERMINAL === */
+        .terminal-wrapper {
+            flex-shrink: 0;
+            border-top: 1px solid var(--md-sys-color-outline-variant);
+            display: flex;
+            flex-direction: column;
+            max-height: 160px;
+        }
+        .terminal-bar {
+            display: flex; align-items: center;
+            padding: 6px 12px;
+            background: #0F0F0F;
+            gap: 6px;
+        }
+        .terminal-bar-title {
+            font-family: var(--md-ref-typeface-mono);
+            font-size: 10px;
+            color: #6A9955;
+            flex: 1;
+            letter-spacing: 0.5px;
+        }
+        .terminal-close {
+            background: none; border: none;
+            color: var(--md-sys-color-outline);
+            font-size: 14px; cursor: pointer;
+            line-height: 1; padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .terminal-close:hover { color: var(--md-sys-color-error); background: rgba(242,184,184,0.08); }
+        .terminal-body {
+            background: #0D0D0D;
+            font-family: var(--md-ref-typeface-mono);
+            font-size: 10.5px;
+            overflow-y: auto;
+            flex: 1;
+            padding: 6px 12px 8px;
+            scrollbar-width: thin;
+            scrollbar-color: #333 transparent;
+        }
+        .t-line { margin-bottom: 3px; display: flex; gap: 6px; }
+        .t-ts { color: #555; flex-shrink: 0; }
+        .t-msg.info  { color: #A5D6A7; }
+        .t-msg.warn  { color: #FFD54F; }
+        .t-msg.error { color: #EF9A9A; }
+        .t-msg.log   { color: #90A4AE; }
+        .t-cursor {
+            display: inline-block; width: 7px; height: 12px;
+            background: #A5D6A7; vertical-align: middle;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        .t-empty { color: #444; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <!-- TOP APP BAR -->
+    <header class="top-app-bar">
+        <span class="top-app-bar-title">▶ ytライト</span>
+        <select id="theme_selector">
+            <option value="dark">Dark</option>
+            <option value="amoled">Amoled</option>
+            <option value="light">Light</option>
+        </select>
+    </header>
+
+    <!-- SCROLL AREA -->
+    <div class="scroll-area">
+
+        <!-- Section Header -->
+        <div class="section-header">
+            <span class="section-header-icon">🛠️</span>
+            <span class="section-header-text">Recursos Ativos</span>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="feature-list">
+
+            <div class="feature-card">
+                <span class="feature-icon">🎥</span>
+                <div class="feature-text">
+                    <div class="feature-label">Limitar Qualidade &amp; Codec</div>
+                    <div class="feature-desc">H264 (720p/1080p) para poupar CPU e GPU</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_codec_block">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🎬</span>
+                <div class="feature-text">
+                    <div class="feature-label">Limitar a 30fps</div>
+                    <div class="feature-desc">Bloqueia streams de 60fps+ para reduzir carga da GPU</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_30fps_cap">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">📺</span>
+                <div class="feature-text">
+                    <div class="feature-label">Limitar Resolução a 720p</div>
+                    <div class="feature-desc">Engana o player para nunca pedir streams acima de HD</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_max_720p">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🎧</span>
+                <div class="feature-text">
+                    <div class="feature-label">Áudio em AAC (bloquear Opus)</div>
+                    <div class="feature-desc">Força AAC em vez de Opus — menor overhead de decodificação</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_audio_aac">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">💡</span>
+                <div class="feature-text">
+                    <div class="feature-label">Desativar Modo Ambiente</div>
+                    <div class="feature-desc">Remove a iluminação cinemática ao redor do player</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_ambient_off">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🖼️</span>
+                <div class="feature-text">
+                    <div class="feature-label">Thumbnails Estáticas</div>
+                    <div class="feature-desc">Remove o preview animado (WebP) ao passar o mouse</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_thumb_static">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">📦</span>
+                <div class="feature-text">
+                    <div class="feature-label">Thumbnails em Baixa Resolução</div>
+                    <div class="feature-desc">Substitui capas HD por 320×180 (mqdefault)</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_thumb_lowres">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">⏱️</span>
+                <div class="feature-text">
+                    <div class="feature-label">Pausar Loops Secundários</div>
+                    <div class="feature-desc">Para cálculos de renderização quando o vídeo estiver pausado</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_pause_loops">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🙈</span>
+                <div class="feature-text">
+                    <div class="feature-label">Pausar em Aba Oculta</div>
+                    <div class="feature-desc">Visibility API (Opt-in) — pausa ao trocar de aba</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_hidden_pause">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🔊</span>
+                <div class="feature-text">
+                    <div class="feature-label">Desativar Normalização de Volume</div>
+                    <div class="feature-desc">Mantém o volume original sem compressão do YouTube</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_disable_ln">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🎙️</span>
+                <div class="feature-text">
+                    <div class="feature-label">Desativar Dublagem por IA</div>
+                    <div class="feature-desc">Reverte a faixa de áudio auto-traduzida para o original</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_disable_ai_dub">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">💀</span>
+                <div class="feature-text">
+                    <div class="feature-label">Eco UI Extremo</div>
+                    <div class="feature-desc">Mata animações, Shorts e bloat oculto para máxima fluidez</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_eco_ui">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <script src="popup.js"></script>
+</body>
+</html>

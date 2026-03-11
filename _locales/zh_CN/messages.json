@@ -1,0 +1,43 @@
+{
+   "extensionDescription": {
+      "description": "Extension description",
+      "message": "选择YouTube应该为您播放的视频和音频编解码器"
+   },
+
+   "optionsBlock60fps": {
+      "message": "阻止60fps视频"
+   },
+   "optionsEnable": {
+      "message": "启用 YT Lite"
+   },
+   "optionsBlockAV1": {
+      "message": "阻止 AV1"
+   },
+   "optionsBlockH264": {
+      "message": "阻止 h264 (AVC)"
+   },
+   "optionsBlockMP4A": {
+      "message": "阻止 AAC (MP4A)"
+   },
+   "optionsBlockOpus": {
+      "message": "阻止 Opus"
+   },
+   "optionsBlockVP8": {
+      "message": "阻止 VP8"
+   },
+   "optionsBlockVP9": {
+      "message": "阻止 VP9"
+   },
+   "optionsDisableLN": {
+      "message": "禁用响度标准化"
+   },
+   "optionsTitle": {
+      "message": "YT Lite ▶🚀"
+   },
+   "optionsTitleAudio": {
+      "message": "音频"
+   },
+   "optionsTitleVideo": {
+      "message": "视频"
+   }
+}

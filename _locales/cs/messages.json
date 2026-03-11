@@ -1,0 +1,43 @@
+{
+   "extensionDescription": {
+      "description": "Extension description",
+      "message": "Choose what video and audio codecs YouTube should play for you"
+   },
+
+   "optionsBlock60fps": {
+      "message": "Blokovat 60fps videa"
+   },
+   "optionsEnable": {
+      "message": "Povolit YT Lite"
+   },
+   "optionsBlockAV1": {
+      "message": "Blokovat AV1"
+   },
+   "optionsBlockH264": {
+      "message": "Blokovat h264 (AVC)"
+   },
+   "optionsBlockMP4A": {
+      "message": "Blokovat AAC (MP4A)"
+   },
+   "optionsBlockOpus": {
+      "message": "Blokovat Opus"
+   },
+   "optionsBlockVP8": {
+      "message": "Blokovat VP8"
+   },
+   "optionsBlockVP9": {
+      "message": "Blokovat VP9"
+   },
+   "optionsDisableLN": {
+      "message": "Zakázat normalizaci hlasitosti"
+   },
+   "optionsTitle": {
+      "message": "Možnosti YT Lite ▶🚀"
+   },
+   "optionsTitleAudio": {
+      "message": "Zvuk"
+   },
+   "optionsTitleVideo": {
+      "message": "Video"
+   }
+}

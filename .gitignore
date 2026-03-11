@@ -1,0 +1,10 @@
+# Chrome/Edge/Brave extension build files
+*.zip
+*.pem
+
+# DS_Store
+.DS_Store
+
+# Brain/Artifacts (already in parent/brain)
+brain/
+.system_generated/

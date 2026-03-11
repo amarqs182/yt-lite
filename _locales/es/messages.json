@@ -1,0 +1,43 @@
+{
+   "extensionDescription": {
+      "description": "Extension description",
+      "message": "Elige qué códecs de video y audio debe reproducir YouTube para ti"
+   },
+
+   "optionsBlock60fps": {
+      "message": "Bloquear video a 60fps"
+   },
+   "optionsEnable": {
+      "message": "Habilitar YT Lite"
+   },
+   "optionsBlockAV1": {
+      "message": "Bloquear AV1"
+   },
+   "optionsBlockH264": {
+      "message": "Bloquear h264 (AVC)"
+   },
+   "optionsBlockMP4A": {
+      "message": "Bloquear AAC (MP4A)"
+   },
+   "optionsBlockOpus": {
+      "message": "Bloquear Opus"
+   },
+   "optionsBlockVP8": {
+      "message": "Bloquear VP8"
+   },
+   "optionsBlockVP9": {
+      "message": "Bloquear VP9"
+   },
+   "optionsDisableLN": {
+      "message": "Desactivar Normalización de Volumen"
+   },
+   "optionsTitle": {
+      "message": "YT Lite ▶🚀"
+   },
+   "optionsTitleAudio": {
+      "message": "Audio"
+   },
+   "optionsTitleVideo": {
+      "message": "Video"
+   }
+}
