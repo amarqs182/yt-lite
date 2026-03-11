@@ -8,3 +8,9 @@
 # Brain/Artifacts (already in parent/brain)
 brain/
 .system_generated/
+.antigravity/
+.gemini/
+
+# AI Agent Handover (Keep local for assistants, do not push)
+agent.md
+tech_diff.md
