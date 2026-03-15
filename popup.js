@@ -88,6 +88,28 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // --- SAFETY: Prevent blocking all 3 video codecs ---
+        const av1El = document.getElementById('feat_block_av1');
+        const vp9El = document.getElementById('feat_block_vp9');
+        const h264El = document.getElementById('feat_block_h264');
+
+        const enforceCodecSafety = (changedEl) => {
+            if (av1El && vp9El && h264El && av1El.checked && vp9El.checked && h264El.checked) {
+                // Desmarca outro codec automaticamente para evitar quebrar o player
+                if (changedEl === av1El) vp9El.checked = false;
+                else if (changedEl === vp9El) av1El.checked = false;
+                else if (changedEl === h264El) vp9El.checked = false;
+
+                // Atualiza o storage do codec que foi forçado a desmarcar
+                if (!vp9El.checked) chrome.storage.local.set({ block_vp9: false });
+                if (!av1El.checked) chrome.storage.local.set({ block_av1: false });
+            }
+        };
+
+        if (av1El) av1El.addEventListener('change', () => enforceCodecSafety(av1El));
+        if (vp9El) vp9El.addEventListener('change', () => enforceCodecSafety(vp9El));
+        if (h264El) h264El.addEventListener('change', () => enforceCodecSafety(h264El));
+
         // Theme initialization
         const themeSelector = document.getElementById('theme_selector');
         if (themeSelector) {
