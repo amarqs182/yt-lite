@@ -3,7 +3,7 @@
  *
  * 1. Loads settings from chrome.storage.local
  * 2. Writes them to localStorage (synchronous, readable by injected scripts)
- * 3. Injects codec.js into the page's main world
+ * 3. Injects features into the page's main world
  * 4. Uses chrome.storage.onChanged to live-sync localStorage when popup changes a setting
  */
 
@@ -24,10 +24,16 @@ const DEFAULTS = {
     eco_ui:         false,
     no_transparency: false,
     ab_experiments: false,
+    theme:          'dark',
+    enhance_sharpness: false,
+    enhance_hdr:       false,
+    enhance_audio:     false,
+    run_mode:          'lite'
 };
 
 // Step 1 + 2: Read storage → write localStorage
-chrome.storage.local.get(DEFAULTS, (opts) => {
+chrome.storage.local.get(null, (stored) => {
+    const opts = { ...DEFAULTS, ...stored };
     for (const [k, v] of Object.entries(opts)) {
         localStorage['ytl-' + k] = String(v);
     }
@@ -37,8 +43,12 @@ chrome.storage.local.get(DEFAULTS, (opts) => {
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== 'local') return;
     for (const [key, { newValue }] of Object.entries(changes)) {
-        if (key in DEFAULTS) {
-            localStorage['ytl-' + key] = String(newValue);
-        }
+        localStorage['ytl-' + key] = String(newValue);
     }
+    
+    // Dispatch custom event to notify injected scripts immediately
+    const script = document.createElement('script');
+    script.textContent = `window.dispatchEvent(new CustomEvent('yt-lite-settings-updated'));`;
+    (document.head || document.documentElement).appendChild(script);
+    script.remove();
 });
