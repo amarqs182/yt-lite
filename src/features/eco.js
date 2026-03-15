@@ -125,4 +125,33 @@
         (document.head || document.documentElement).appendChild(extremeStyle);
     }
 
+    // 4. Disable Transparency and Blur (Glassmorphism)
+    if (localStorage['ytl-no_transparency'] === 'true') {
+        const transparencyStyle = document.createElement('style');
+        transparencyStyle.textContent = `
+            /* Kill all backdrop-filters (Blur) globally */
+            * {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+
+            /* Force solid backgrounds on common transparent elements */
+            #masthead-container.ytd-app,
+            .ytp-popup,
+            .ytp-settings-menu,
+            .ytp-drop-down-menu,
+            #description-inner,
+            ytd-playlist-panel-renderer {
+                background-color: var(--yt-spec-general-background-a) !important;
+                opacity: 1 !important;
+            }
+            
+            /* Player bottom bar */
+            .ytp-chrome-bottom {
+                background: rgba(0,0,0,0.8) !important;
+            }
+        `;
+        (document.head || document.documentElement).appendChild(transparencyStyle);
+    }
+
 })();

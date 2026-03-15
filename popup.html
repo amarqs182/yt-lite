@@ -394,8 +394,8 @@
                     <span class="feature-title">Codecs de Áudio</span>
                 </div>
                 <div class="segmented-control" id="group_audio_codecs" style="width: 120px;">
-                    <button class="segment-btn" data-key="block_opus" data-invert="true">OPUS</button>
-                    <button class="segment-btn" data-active="true">AAC</button>
+                    <button class="segment-btn" data-val="opus">OPUS</button>
+                    <button class="segment-btn" data-val="aac">AAC</button>
                 </div>
             </div>
 
@@ -422,6 +422,22 @@
             <div class="feature-item">
                 <div class="feature-info"><span class="feature-title">Pausar Aba Oculta</span></div>
                 <label class="switch"><input type="checkbox" id="feat_hidden_pause"><span class="slider"></span></label>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-info">
+                    <span class="feature-title">Capas em Baixa Resolução</span>
+                    <span class="feature-desc">Carrega miniaturas menores para poupar banda.</span>
+                </div>
+                <label class="switch"><input type="checkbox" id="feat_thumb_lowres"><span class="slider"></span></label>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-info">
+                    <span class="feature-title">Remover Transparências</span>
+                    <span class="feature-desc">Desativa efeitos de Blur (Glassmorphism) para fluidez.</span>
+                </div>
+                <label class="switch"><input type="checkbox" id="feat_no_transparency"><span class="slider"></span></label>
             </div>
 
             <div class="feature-item">

@@ -1,14 +1,16 @@
 /**
  * popup.js — YT Lite
- * Horizontal buttons logic.
+ * Horizontal buttons logic and bug fixes.
  */
 
 const TOGGLE_MAP = [
     { id: 'feat_ambient_off',    key: 'ambient_off',     def: true  },
     { id: 'feat_hidden_pause',   key: 'hidden_pause',    def: false },
+    { id: 'feat_thumb_lowres',   key: 'thumb_lowres',    def: false },
     { id: 'feat_disable_ln',     key: 'disable_ln',      def: false },
     { id: 'feat_disable_ai_dub', key: 'disable_ai_dub',  def: true  },
     { id: 'feat_eco_ui',         key: 'eco_ui',          def: false },
+    { id: 'feat_no_transparency',key: 'no_transparency', def: false },
     { id: 'feat_ab_experiments', key: 'ab_experiments',  def: false },
 ];
 
@@ -65,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             el.addEventListener('change', () => chrome.storage.local.set({ [key]: el.value }));
         });
 
-        // Segmented: Codecs
+        // Segmented: Codecs & FPS
         const setupSegmented = (groupId, storageKey, isMulti = false) => {
             const container = document.getElementById(groupId);
             if (!container) return;
@@ -74,14 +76,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const updateUI = () => {
                 buttons.forEach(btn => {
                     const key = btn.dataset.key;
+                    const val = btn.dataset.val;
                     if (key) {
                         const isBlocked = stored[key] === true || stored[key] === 'true';
-                        // Button Active = NOT blocked
                         if (isBlocked) btn.classList.remove('active');
                         else btn.classList.add('active');
-                    } else if (btn.dataset.val) {
-                        if (stored[storageKey] === btn.dataset.val) btn.classList.add('active');
-                        else btn.classList.remove('active');
+                    } else if (val) {
+                        if (groupId === 'group_audio_codecs') {
+                            const blockOpus = stored['block_opus'] === true || stored['block_opus'] === 'true';
+                            if ((val === 'opus' && !blockOpus) || (val === 'aac' && blockOpus)) {
+                                btn.classList.add('active');
+                            } else {
+                                btn.classList.remove('active');
+                            }
+                        } else {
+                            if (stored[storageKey] === val) btn.classList.add('active');
+                            else btn.classList.remove('active');
+                        }
                     }
                 });
             };
@@ -90,9 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.addEventListener('click', () => {
                     if (btn.dataset.key) {
                         const key = btn.dataset.key;
-                        const newState = !btn.classList.contains('active'); // If we make it active, block = false
+                        const newState = !btn.classList.contains('active'); 
                         
-                        // Safety: at least one codec
                         if (!newState && isMulti) {
                             const activeCount = container.querySelectorAll('.segment-btn.active').length;
                             if (activeCount <= 1) return;
@@ -103,8 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         updateUI();
                     } else if (btn.dataset.val) {
                         const val = btn.dataset.val;
-                        stored[storageKey] = val;
-                        chrome.storage.local.set({ [storageKey]: val });
+                        if (groupId === 'group_audio_codecs') {
+                            const blockOpus = (val === 'aac');
+                            stored['block_opus'] = blockOpus;
+                            chrome.storage.local.set({ 'block_opus': blockOpus });
+                        } else {
+                            stored[storageKey] = val;
+                            chrome.storage.local.set({ [storageKey]: val });
+                        }
                         updateUI();
                     }
                 });
@@ -132,14 +148,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const port = chrome.runtime.connect({ name: 'yt-lite-debug' });
         port.onMessage.addListener((msg) => {
             if (msg.type === 'history' || msg.type === 'new_log') {
+                if (logOutput.querySelector('.t-line:not(.t-ts)')) {
+                    const placeholder = logOutput.querySelector('.t-line:not(.t-ts)');
+                    if (placeholder && placeholder.textContent.includes('Aguardando')) {
+                        logOutput.innerHTML = '';
+                    }
+                }
+
                 const logs = msg.type === 'history' ? msg.logs : [msg.log];
                 logs.forEach(l => {
                     const line = document.createElement('div');
                     line.className = 't-line';
                     line.innerHTML = `<span class="t-time">[${l.ts}]</span> <span class="t-blocked">${l.ruleId === 3 ? 'LOG' : 'STATS'}</span> blocked`;
                     logOutput.prepend(line);
+                    
+                    if (logOutput.children.length > 50) logOutput.lastElementChild.remove();
                 });
             }
         });
     } catch(e) {}
+
+    document.getElementById('btn_copy_logs')?.addEventListener('click', () => {
+        const lines = Array.from(logOutput.querySelectorAll('.t-line')).map(l => l.innerText);
+        if (lines.length === 0 || lines[0].includes('Aguardando')) return;
+        navigator.clipboard.writeText(lines.join('\n')).then(() => {
+            const btn = document.getElementById('btn_copy_logs');
+            const oldText = btn.textContent;
+            btn.textContent = 'Copied';
+            setTimeout(() => btn.textContent = oldText, 1000);
+        });
+    });
 });

@@ -22,6 +22,7 @@ const DEFAULTS = {
     disable_ln:     false,
     disable_ai_dub: true,
     eco_ui:         false,
+    no_transparency: false,
     ab_experiments: false,
 };
 
@@ -32,7 +33,7 @@ chrome.storage.local.get(DEFAULTS, (opts) => {
     }
 });
 
-// Step 4: Live-sync on any storage change (popup toggle/select, etc.)
+// Step 4: Live-sync on any storage change
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== 'local') return;
     for (const [key, { newValue }] of Object.entries(changes)) {
