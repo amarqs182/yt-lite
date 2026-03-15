@@ -9,9 +9,11 @@
  */
 
 const DEFAULTS = {
-    block_codecs:   true,
-    block_60fps:    true,
+    block_av1:      true,
+    block_vp9:      true,
+    block_h264:     false,
     block_opus:     false,
+    block_60fps:    true,
     max_720p:       false,
     ambient_off:    true,
     thumb_static:   true,

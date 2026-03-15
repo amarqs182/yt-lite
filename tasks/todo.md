@@ -14,3 +14,7 @@
 - [x] Criar background script para monitorar declarativeNetRequestFeedback
 - [x] Adicionar botão de 'Copiar Log' e área de terminal no popup.html
 - [x] Implementar integração do popup com o background.js para receber os logs
+
+## Etapa 5: Seleção de Codecs e Suporte a Hardware
+- [x] Alterar UI para permitir bloqueio de AV1, VP9, H264 e Opus individualmente
+- [x] Implementar detecção de hardware (API navigator.mediaCapabilities) para auxiliar na UI

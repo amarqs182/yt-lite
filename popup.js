@@ -10,10 +10,12 @@
 
 // HTML element ID → storage key + default value
 const TOGGLE_MAP = [
-    { id: 'feat_codec_block',    key: 'block_codecs',    def: true  },
+    { id: 'feat_block_av1',      key: 'block_av1',       def: true  },
+    { id: 'feat_block_vp9',      key: 'block_vp9',       def: true  },
+    { id: 'feat_block_h264',     key: 'block_h264',      def: false },
+    { id: 'feat_block_opus',     key: 'block_opus',      def: false },
     { id: 'feat_30fps_cap',      key: 'block_60fps',     def: true  },
     { id: 'feat_max_720p',       key: 'max_720p',        def: false },
-    { id: 'feat_audio_aac',      key: 'block_opus',      def: false },
     { id: 'feat_ambient_off',    key: 'ambient_off',     def: true  },
     { id: 'feat_thumb_static',   key: 'thumb_static',    def: true  },
     { id: 'feat_thumb_lowres',   key: 'thumb_lowres',    def: false },
@@ -28,6 +30,48 @@ const TOGGLE_MAP = [
 const DEFAULTS = Object.fromEntries(TOGGLE_MAP.map(t => [t.key, t.def]));
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // HW Detection
+    const btnDetectHw = document.getElementById('btn_detect_hw');
+    const hwLabel = document.getElementById('hw_support_label');
+    
+    if (btnDetectHw) {
+        btnDetectHw.addEventListener('click', async () => {
+            btnDetectHw.textContent = "Testando...";
+            let results = [];
+            
+            // Check AV1
+            if (navigator.mediaCapabilities) {
+                try {
+                    const av1 = await navigator.mediaCapabilities.decodingInfo({
+                        type: 'media-source',
+                        video: { contentType: 'video/mp4; codecs="av01.0.05M.08"', width: 1920, height: 1080, bitrate: 5000000, framerate: 30 }
+                    });
+                    results.push(`AV1: ${av1.powerEfficient ? '✅ Hardware' : (av1.supported ? '⚠️ Software' : '❌ Não')}`);
+                } catch(e) {}
+                
+                try {
+                    const vp9 = await navigator.mediaCapabilities.decodingInfo({
+                        type: 'media-source',
+                        video: { contentType: 'video/mp4; codecs="vp09.00.10.08"', width: 1920, height: 1080, bitrate: 5000000, framerate: 30 }
+                    });
+                    results.push(`VP9: ${vp9.powerEfficient ? '✅ Hardware' : (vp9.supported ? '⚠️ Software' : '❌ Não')}`);
+                } catch(e) {}
+                
+                try {
+                    const h264 = await navigator.mediaCapabilities.decodingInfo({
+                        type: 'media-source',
+                        video: { contentType: 'video/mp4; codecs="avc1.640028"', width: 1920, height: 1080, bitrate: 5000000, framerate: 30 }
+                    });
+                    results.push(`H264: ${h264.powerEfficient ? '✅ Hardware' : (h264.supported ? '⚠️ Software' : '❌ Não')}`);
+                } catch(e) {}
+            }
+            
+            hwLabel.innerHTML = `<strong>Decodificação do seu PC:</strong><br>${results.join('<br>')}<br><br><em>(Dica: Se aparecer 'Software' ou 'Não', bloqueie o codec acima para evitar superaquecimento).</em>`;
+            hwLabel.style.display = 'block';
+            btnDetectHw.textContent = "Testado!";
+        });
+    }
 
     // Load all settings and initialize toggles
     // Ref: developer.chrome.com/docs/extensions/reference/api/storage#method-StorageArea-get
@@ -72,9 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let html = '';
+        const ruleNames = {
+            1: "QOE_STATS",
+            2: "ADS_STATS",
+            3: "LOG_EVENT"
+        };
+
         allLogs.forEach(l => {
-            const ruleColor = l.ruleId === 3 ? 'error' : 'warn'; // Rule 3 = log_event
-            html += `<div class="t-line"><span class="t-ts">[${l.ts}]</span> <span class="t-msg ${ruleColor}">BLOCKED: ${l.url}</span></div>`;
+            const ruleColor = l.ruleId === 3 ? 'error' : 'warn'; 
+            const ruleName = ruleNames[l.ruleId] || `RULE_${l.ruleId}`;
+            html += `<div class="t-line"><span class="t-ts">[${l.ts}]</span> <span class="t-msg ${ruleColor}">[${ruleName}] BLOCKED: ${l.url}</span></div>`;
         });
         logOutput.innerHTML = html;
     }

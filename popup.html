@@ -288,23 +288,72 @@
         <!-- Section Header -->
         <div class="section-header">
             <span class="section-header-icon">🛠️</span>
-            <span class="section-header-text">Recursos Ativos</span>
+            <span class="section-header-text">Controle de Codecs</span>
+            <button id="btn_detect_hw" style="margin-left: auto; padding: 4px 8px; border-radius: 4px; background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-surface); border: none; cursor: pointer; font-size: 11px;">🕵️ Testar PC</button>
+        </div>
+        
+        <div class="feature-list">
+            <!-- Hardware Support Label -->
+            <div id="hw_support_label" style="display: none; font-size: 12px; margin: 0 4px 8px; padding: 8px; background: var(--md-sys-color-surface-container-high); border-radius: 8px; color: var(--md-sys-color-tertiary);"></div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🎞️</span>
+                <div class="feature-text">
+                    <div class="feature-label">Bloquear AV1</div>
+                    <div class="feature-desc">Recomendado bloquear se não tiver RTX Série 30+/RX 6000+</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_block_av1">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🎞️</span>
+                <div class="feature-text">
+                    <div class="feature-label">Bloquear VP9</div>
+                    <div class="feature-desc">Recomendado se quiser forçar H264 (menos uso de CPU)</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_block_vp9">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">📼</span>
+                <div class="feature-text">
+                    <div class="feature-label">Bloquear H264</div>
+                    <div class="feature-desc">CUIDADO: Pode quebrar a reprodução se AV1/VP9 falharem</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_block_h264">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">🎧</span>
+                <div class="feature-text">
+                    <div class="feature-label">Bloquear Opus (Áudio)</div>
+                    <div class="feature-desc">Força o player a usar áudio MP4A/AAC</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_block_opus">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
+            <div class="m3-divider"></div>
+        </div>
+
+        <div class="section-header">
+            <span class="section-header-icon">📺</span>
+            <span class="section-header-text">Otimizações Gerais</span>
         </div>
 
         <!-- Feature Cards -->
         <div class="feature-list">
-
-            <div class="feature-card">
-                <span class="feature-icon">🎥</span>
-                <div class="feature-text">
-                    <div class="feature-label">Limitar Qualidade &amp; Codec</div>
-                    <div class="feature-desc">H264 (720p/1080p) para poupar CPU e GPU</div>
-                </div>
-                <label class="m3-switch">
-                    <input type="checkbox" id="feat_codec_block">
-                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
-                </label>
-            </div>
 
             <div class="feature-card">
                 <span class="feature-icon">🎬</span>
@@ -326,18 +375,6 @@
                 </div>
                 <label class="m3-switch">
                     <input type="checkbox" id="feat_max_720p">
-                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
-                </label>
-            </div>
-
-            <div class="feature-card">
-                <span class="feature-icon">🎧</span>
-                <div class="feature-text">
-                    <div class="feature-label">Áudio em AAC (bloquear Opus)</div>
-                    <div class="feature-desc">Força AAC em vez de Opus — menor overhead de decodificação</div>
-                </div>
-                <label class="m3-switch">
-                    <input type="checkbox" id="feat_audio_aac">
                     <span class="m3-track"><span class="m3-thumb">✓</span></span>
                 </label>
             </div>
