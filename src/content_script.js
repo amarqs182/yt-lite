@@ -2,9 +2,8 @@
  * src/content_script.js
  *
  * 1. Loads settings from chrome.storage.local
- * 2. Writes them to localStorage (synchronous, readable by injected scripts)
- * 3. Injects features into the page's main world
- * 4. Uses chrome.storage.onChanged to live-sync localStorage when popup changes a setting
+ * 2. Syncs them to the MAIN world's localStorage (since features run in MAIN)
+ * 3. Dispatches event for live-sync without reload
  */
 
 const DEFAULTS = {
@@ -31,24 +30,34 @@ const DEFAULTS = {
     run_mode:          'lite'
 };
 
-// Step 1 + 2: Read storage → write localStorage
-chrome.storage.local.get(null, (stored) => {
-    const opts = { ...DEFAULTS, ...stored };
-    for (const [k, v] of Object.entries(opts)) {
-        localStorage['ytl-' + k] = String(v);
-    }
-});
-
-// Step 4: Live-sync on any storage change
-chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== 'local') return;
-    for (const [key, { newValue }] of Object.entries(changes)) {
-        localStorage['ytl-' + key] = String(newValue);
-    }
-    
-    // Dispatch custom event to notify injected scripts immediately
+// Function to inject settings into the Page's context (MAIN world)
+const injectToMainWorld = (settings) => {
     const script = document.createElement('script');
-    script.textContent = `window.dispatchEvent(new CustomEvent('yt-lite-settings-updated'));`;
+    script.textContent = `
+        (() => {
+            const data = ${JSON.stringify(settings)};
+            for (const [k, v] of Object.entries(data)) {
+                localStorage.setItem('ytl-' + k, String(v));
+            }
+            window.dispatchEvent(new CustomEvent('yt-lite-settings-updated'));
+        })();
+    `;
     (document.head || document.documentElement).appendChild(script);
     script.remove();
+};
+
+// Initial Sync
+chrome.storage.local.get(null, (stored) => {
+    const opts = { ...DEFAULTS, ...stored };
+    injectToMainWorld(opts);
+});
+
+// Live Sync on change
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'local') return;
+    const updates = {};
+    for (const [key, { newValue }] of Object.entries(changes)) {
+        updates[key] = newValue;
+    }
+    injectToMainWorld(updates);
 });

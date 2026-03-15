@@ -1,7 +1,7 @@
 /**
  * src/features/enhancer.js
  * Premium Visual and Audio Enhancements for High Mode.
- * Now with Live Sync support (works immediately without reload).
+ * Corrected: Now handles world-to-world sync correctly.
  */
 
 (function() {
@@ -9,47 +9,35 @@
 
     if (window.self !== window.top || window.location.href === 'about:blank') return;
 
-    // Helper to get fresh settings from localStorage
     const getSettings = () => ({
-        useSharpness: localStorage['ytl-enhance_sharpness'] === 'true',
-        useHDR:       localStorage['ytl-enhance_hdr']       === 'true',
-        useAudio:     localStorage['ytl-enhance_audio']     === 'true'
+        useSharpness: localStorage.getItem('ytl-enhance_sharpness') === 'true',
+        useHDR:       localStorage.getItem('ytl-enhance_hdr')       === 'true',
+        useAudio:     localStorage.getItem('ytl-enhance_audio')     === 'true'
     });
 
-    // --- 1. LIVE VISUAL FILTERS (CSS Style Injection) ---
+    // --- 1. VISUAL FILTERS ---
     const updateVisualFX = () => {
         const { useSharpness, useHDR } = getSettings();
-        const id = 'yt-lite-premium-fx';
-        let style = document.getElementById(id);
-        
-        if (!useSharpness && !useHDR) {
-            if (style) style.remove();
-            return;
-        }
-
-        if (!style) {
-            style = document.createElement('style');
-            style.id = id;
-            (document.head || document.documentElement).appendChild(style);
-        }
+        const video = document.querySelector('video.html5-main-video');
+        if (!video) return;
 
         let filters = [];
-        if (useHDR) filters.push('contrast(1.12) saturate(1.30) brightness(1.04)');
+        // Ultra-aggressive HDR for testing
+        if (useHDR) filters.push('contrast(1.15) saturate(1.40) brightness(1.05)');
         if (useSharpness) filters.push('contrast(1.02)');
 
-        style.textContent = `
-            video.html5-main-video {
-                filter: ${filters.join(' ')} !important;
-                ${useSharpness ? 'image-rendering: -webkit-optimize-contrast !important; image-rendering: crisp-edges !important;' : ''}
-            }
-        `;
+        if (filters.length > 0) {
+            video.style.setProperty('filter', filters.join(' '), 'important');
+            video.style.setProperty('image-rendering', '-webkit-optimize-contrast', 'important');
+            console.log("YT Lite: Visual Filters Applied");
+        } else {
+            video.style.filter = '';
+        }
     };
 
-    // --- 2. AUDIO ENHANCEMENTS (Dynamic Hook) ---
+    // --- 2. AUDIO FX (Musical Compressor) ---
     let audioCtx = null;
-    let source = null;
     let compressor = null;
-    let merger = null;
 
     const applyAudioFX = () => {
         const { useAudio } = getSettings();
@@ -57,67 +45,53 @@
         if (!video) return;
 
         if (!useAudio) {
-            // Disconnecting AudioContext safely is complex, usually we just set bypass
-            if (compressor) compressor.threshold.value = 0; // Effectively bypass
+            if (compressor) compressor.threshold.value = 0; // Bypass
             return;
         }
 
         if (video.ytLiteAudioHooked) {
-            if (compressor) compressor.threshold.value = -24; // Reactivate
+            if (compressor) compressor.threshold.value = -20;
             return;
         }
 
         try {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            source = audioCtx.createMediaElementSource(video);
+            const source = audioCtx.createMediaElementSource(video);
             
+            // "Musical" Compressor setup
             compressor = audioCtx.createDynamicsCompressor();
-            compressor.threshold.value = -24;
-            compressor.ratio.value = 4;
-
-            const splitter = audioCtx.createChannelSplitter(2);
-            merger = audioCtx.createChannelMerger(2);
-            const delay = audioCtx.createDelay();
-            delay.delayTime.value = 0.012;
+            compressor.threshold.value = -20; // Lower threshold to catch more
+            compressor.knee.value = 30;      // Soft knee for music
+            compressor.ratio.value = 3;      // Subtle ratio
+            compressor.attack.value = 0.01;  // Slow attack to preserve punch
+            compressor.release.value = 0.25;
 
             source.connect(compressor);
-            compressor.connect(splitter);
-            splitter.connect(merger, 0, 0);
-            splitter.connect(delay, 1);
-            delay.connect(merger, 0, 1);
-            merger.connect(audioCtx.destination);
+            compressor.connect(audioCtx.destination);
             
             video.ytLiteAudioHooked = true;
+            console.log("YT Lite: Musical Audio Compressor Active");
         } catch (e) {
-            console.warn("YT Lite: Audio FX blocked by CORS.");
+            // Note: CORS issues are common on YouTube Music/Official videos
+            console.warn("YT Lite: Audio Enhancement blocked by YouTube's security policy (CORS).");
         }
     };
 
-    // --- LIVE SYNC LISTENER ---
-    // This watches for changes in localStorage sent by content_script.js
-    window.addEventListener('storage', (e) => {
-        if (e.key.startsWith('ytl-enhance_')) {
-            updateVisualFX();
-            if (e.key === 'ytl-enhance_audio') applyAudioFX();
-        }
-    });
-
-    // Custom event from content_script for more reliable live updates
+    // --- EVENT LISTENERS ---
     window.addEventListener('yt-lite-settings-updated', () => {
         updateVisualFX();
         applyAudioFX();
     });
 
-    // Initial and Navigation run
     const run = () => {
         updateVisualFX();
         applyAudioFX();
     };
 
-    window.addEventListener('yt-navigate-finish', () => setTimeout(run, 1000));
+    window.addEventListener('yt-navigate-finish', () => setTimeout(run, 1500));
     run();
     
-    // Safety pulse to ensure styles aren't overwritten by YT
-    setInterval(updateVisualFX, 3000);
+    // Pulse check to prevent YouTube from stripping styles
+    setInterval(updateVisualFX, 4000);
 
 })();
