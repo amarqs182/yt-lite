@@ -122,7 +122,7 @@
             padding: 16px 20px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
         }
 
         .scroll-area::-webkit-scrollbar { width: 4px; }
@@ -179,39 +179,28 @@
         /* === FEATURE LIST === */
         .feature-item {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 2px 0;
             gap: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .feature-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
         }
 
         .feature-info {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 2px;
         }
 
         .feature-title {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 500;
             color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
-        .icon-small { font-size: 14px; opacity: 0.8; }
-
         .feature-desc {
-            font-size: 11px;
-            line-height: 1.4;
+            font-size: 10.5px;
+            line-height: 1.3;
             color: var(--text-secondary);
         }
 
@@ -225,117 +214,110 @@
             letter-spacing: 0.02em;
         }
 
-        /* === SELECT INPUTS === */
-        .select-group {
+        /* === SEGMENTED CONTROL === */
+        .segmented-control {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
-            width: 140px;
-            flex-shrink: 0;
-            margin-top: 2px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            width: 100%;
         }
+        
+        .segment-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            border-right: 1px solid var(--border-color);
+            padding: 7px 0;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+            text-align: center;
+        }
+        
+        .segment-btn:last-child { border-right: none; }
+        
+        .segment-btn:hover:not(.active) { background: rgba(0,0,0,0.05); color: var(--text-primary); }
+        
+        .segment-btn.active {
+            background: var(--accent-color);
+            color: #FFFFFF;
+        }
+        
+        :root[data-theme="dark"] .segment-btn:hover:not(.active),
+        :root[data-theme="amoled"] .segment-btn:hover:not(.active) { background: rgba(255,255,255,0.05); }
 
+        /* === SELECT INPUTS === */
         .styled-select {
             appearance: none;
             background: var(--bg-elevated);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            padding: 6px 26px 6px 10px;
+            padding: 5px 24px 5px 10px;
             border-radius: var(--radius-sm);
             font-family: var(--font-sans);
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 500;
             cursor: pointer;
             outline: none;
-            transition: all 0.2s ease;
+            width: 100%;
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat, repeat;
             background-position: right .7em top 50%, 0 0;
             background-size: .65em auto, 100%;
         }
 
-        .styled-select:hover { border-color: var(--text-tertiary); }
-        .styled-select:focus { border-color: var(--accent-color); }
-
         /* === iOS STYLE SWITCH === */
         .switch {
             position: relative;
             display: inline-block;
-            width: 36px;
-            height: 20px;
+            width: 34px;
+            height: 18px;
             flex-shrink: 0;
-            margin-top: 1px;
         }
         .switch input { opacity: 0; width: 0; height: 0; }
-
         .slider {
-            position: absolute;
-            cursor: pointer;
+            position: absolute; cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: var(--bg-elevated);
             border: 1px solid var(--border-color);
-            transition: .3s;
-            border-radius: var(--radius-full);
+            transition: .3s; border-radius: var(--radius-full);
         }
-
         .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px; width: 14px;
+            position: absolute; content: "";
+            height: 12px; width: 12px;
             left: 2px; bottom: 2px;
             background-color: var(--text-secondary);
-            transition: .3s;
-            border-radius: 50%;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transition: .3s; border-radius: 50%;
         }
-
-        input:checked + .slider {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-        }
-        input:checked + .slider:before {
-            background-color: #FFFFFF;
-            transform: translateX(16px);
-        }
+        input:checked + .slider { background-color: var(--accent-color); border-color: var(--accent-color); }
+        input:checked + .slider:before { background-color: #FFFFFF; transform: translateX(16px); }
 
         /* === TERMINAL === */
         .terminal {
             border-top: 1px solid var(--border-color);
             background: var(--bg-base);
-            height: 120px;
+            height: 110px;
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
         }
-
         .terminal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 6px 12px;
-            background: var(--bg-surface);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 4px 12px; background: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
         }
-
-        .terminal-title {
-            font-family: var(--font-mono);
-            font-size: 9px;
-            font-weight: 600;
-            color: var(--text-tertiary);
-            letter-spacing: 0.05em;
-        }
-
+        .terminal-title { font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary); }
         .terminal-content {
-            padding: 8px 12px;
-            overflow-y: auto;
-            font-family: var(--font-mono);
-            font-size: 10px;
-            line-height: 1.5;
-            background: var(--bg-base);
-            flex: 1;
+            padding: 6px 12px; overflow-y: auto; font-family: var(--font-mono);
+            font-size: 10px; background: var(--bg-base); flex: 1;
         }
-
-        .t-line { color: var(--text-secondary); word-break: break-all; }
+        .t-line { color: var(--text-secondary); }
         .t-time { color: var(--text-tertiary); margin-right: 6px; }
         .t-blocked { color: var(--accent-color); }
         .t-error { color: var(--danger-color); }
@@ -357,47 +339,32 @@
 
     <div class="scroll-area">
 
-        <!-- VIDEO SETTINGS -->
+        <!-- CODECS -->
         <div class="section">
             <div class="section-header">
                 <span class="section-title">📺 Vídeo & Qualidade</span>
-                <button id="btn_detect_hw" class="btn-ghost">Testar Hardware</button>
+                <button id="btn_detect_hw" class="btn-ghost">Testar GPU</button>
             </div>
             
             <div id="hw_support_label"></div>
 
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title"><span class="icon-small">🎞️</span> Bloquear AV1</span>
-                    <span class="feature-desc">Se o hardware não suportar.</span>
-                </div>
-                <label class="switch"><input type="checkbox" id="feat_block_av1"><span class="slider"></span></label>
+            <div class="feature-info">
+                <span class="feature-title">Codecs de Vídeo Permitidos</span>
+                <span class="feature-desc">Ative os formatos que sua placa de vídeo suporta.</span>
+            </div>
+            <div class="segmented-control" id="group_video_codecs">
+                <button class="segment-btn" data-key="block_av1" data-invert="true">AV1</button>
+                <button class="segment-btn" data-key="block_vp9" data-invert="true">VP9</button>
+                <button class="segment-btn" data-key="block_h264" data-invert="true">H.264</button>
             </div>
 
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title"><span class="icon-small">🎞️</span> Bloquear VP9</span>
-                    <span class="feature-desc">Rejeita o padrão secundário.</span>
-                </div>
-                <label class="switch"><input type="checkbox" id="feat_block_vp9"><span class="slider"></span></label>
-            </div>
-
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title"><span class="icon-small">📼</span> Bloquear H.264</span>
-                    <span class="feature-desc">Rejeita o formato de segurança.</span>
-                </div>
-                <label class="switch"><input type="checkbox" id="feat_block_h264"><span class="slider"></span></label>
-            </div>
-
-            <div class="feature-item">
+            <div class="feature-item" style="margin-top: 4px;">
                 <div class="feature-info">
                     <span class="feature-title">Resolução Máxima</span>
-                    <span class="feature-desc">Impede que vídeos abram em qualidades muito altas.</span>
                 </div>
-                <div class="select-group">
+                <div style="width: 100px;">
                     <select id="feat_max_res" class="styled-select">
-                        <option value="auto">Ilimitado</option>
+                        <option value="auto">∞ Auto</option>
                         <option value="1080">1080p</option>
                         <option value="720">720p</option>
                         <option value="480">480p</option>
@@ -409,107 +376,73 @@
 
             <div class="feature-item">
                 <div class="feature-info">
-                    <span class="feature-title">Taxa de Quadros</span>
-                    <span class="feature-desc">Limita os vídeos pesados.</span>
+                    <span class="feature-title">Taxa de Quadros (FPS)</span>
                 </div>
-                <div class="select-group">
-                    <select id="feat_max_fps" class="styled-select">
-                        <option value="auto">60 FPS</option>
-                        <option value="30">30 FPS</option>
-                    </select>
+                <div class="segmented-control" id="group_max_fps" style="width: 100px;">
+                    <button class="segment-btn" data-val="30">30</button>
+                    <button class="segment-btn" data-val="auto">60</button>
                 </div>
             </div>
         </div>
 
-        <!-- AUDIO SETTINGS -->
+        <!-- AUDIO -->
         <div class="section">
-            <div class="section-header">
-                <span class="section-title">🎧 Áudio</span>
+            <div class="section-header"><span class="section-title">🎧 Áudio</span></div>
+            
+            <div class="feature-item">
+                <div class="feature-info">
+                    <span class="feature-title">Codecs de Áudio</span>
+                </div>
+                <div class="segmented-control" id="group_audio_codecs" style="width: 120px;">
+                    <button class="segment-btn" data-key="block_opus" data-invert="true">OPUS</button>
+                    <button class="segment-btn" data-active="true">AAC</button>
+                </div>
             </div>
 
             <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title"><span class="icon-small">🎵</span> Bloquear Opus</span>
-                    <span class="feature-desc">Força o player a usar áudio MP4A/AAC.</span>
-                </div>
-                <label class="switch"><input type="checkbox" id="feat_block_opus"><span class="slider"></span></label>
-            </div>
-
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Normalização de Volume</span>
-                    <span class="feature-desc">Desativa a compressão dinâmica nativa do YouTube.</span>
-                </div>
+                <div class="feature-info"><span class="feature-title">Normalização de Áudio</span></div>
                 <label class="switch"><input type="checkbox" id="feat_disable_ln"><span class="slider"></span></label>
             </div>
 
             <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Dublagem por IA</span>
-                    <span class="feature-desc">Força o idioma original do criador.</span>
-                </div>
+                <div class="feature-info"><span class="feature-title">Dublagem por IA</span></div>
                 <label class="switch"><input type="checkbox" id="feat_disable_ai_dub"><span class="slider"></span></label>
             </div>
         </div>
 
-        <!-- PERFORMANCE & UI -->
+        <!-- PERFORMANCE -->
         <div class="section">
-            <div class="section-header">
-                <span class="section-title">⚡ Otimização & Interface</span>
-            </div>
+            <div class="section-header"><span class="section-title">⚡ Otimização & UI</span></div>
 
             <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Modo Ambiente</span>
-                    <span class="feature-desc">Remove o brilho colorido atrás do player que suga GPU.</span>
-                </div>
+                <div class="feature-info"><span class="feature-title">Modo Ambiente</span></div>
                 <label class="switch"><input type="checkbox" id="feat_ambient_off"><span class="slider"></span></label>
             </div>
             
             <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Thumbnails Animadas</span>
-                    <span class="feature-desc">Desativa o preview de vídeo (WebP) ao passar o mouse.</span>
-                </div>
-                <label class="switch"><input type="checkbox" id="feat_thumb_static"><span class="slider"></span></label>
-            </div>
-
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Pausar Aba Oculta</span>
-                    <span class="feature-desc">Pausa vídeo/loops automaticamente ao trocar de aba.</span>
-                </div>
+                <div class="feature-info"><span class="feature-title">Pausar Aba Oculta</span></div>
                 <label class="switch"><input type="checkbox" id="feat_hidden_pause"><span class="slider"></span></label>
             </div>
 
             <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Eco UI <span class="badge-experimental">EXTREMO</span></span>
-                    <span class="feature-desc">Esconde Shorts, limpa menus pesados e mata animações.</span>
-                </div>
+                <div class="feature-info"><span class="feature-title">Eco UI Extremo</span></div>
                 <label class="switch"><input type="checkbox" id="feat_eco_ui"><span class="slider"></span></label>
             </div>
             
             <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Bloquear Experimentos</span>
-                    <span class="feature-desc">Congela flags do YT, impedindo testes de layout em background.</span>
-                </div>
+                <div class="feature-info"><span class="feature-title">Bloquear Experimentos</span></div>
                 <label class="switch"><input type="checkbox" id="feat_ab_experiments"><span class="slider"></span></label>
             </div>
         </div>
 
     </div>
 
-    <!-- TERMINAL DEBUG -->
     <div class="terminal">
         <div class="terminal-header">
-            <span class="terminal-title">TELEMETRY_BLOCK_LOGS</span>
-            <button id="btn_copy_logs" class="btn-ghost" title="Copiar logs">Copy</button>
+            <span class="terminal-title">TELEMETRY_LOGS</span>
+            <button id="btn_copy_logs" class="btn-ghost">Copy</button>
         </div>
-        <div class="terminal-content" id="log_output">
-            <div class="t-line">Aguardando telemetria...</div>
-        </div>
+        <div class="terminal-content" id="log_output"><div class="t-line">Aguardando...</div></div>
     </div>
 
     <script src="popup.js"></script>
