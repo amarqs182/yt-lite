@@ -1,25 +1,14 @@
 /**
  * popup.js — YT Lite
  *
- * Reads settings from chrome.storage.local, wires HTML toggles.
+ * Reads settings from chrome.storage.local, wires HTML elements.
  * On change: writes directly to chrome.storage.local — no background relay needed.
- * content_script.js picks up changes via chrome.storage.onChanged automatically.
- *
- * Ref: developer.chrome.com/docs/extensions/reference/api/storage
  */
 
-// HTML element ID → storage key + default value
+// Mapping of input IDs to storage keys
 const TOGGLE_MAP = [
-    { id: 'feat_block_av1',      key: 'block_av1',       def: true  },
-    { id: 'feat_block_vp9',      key: 'block_vp9',       def: true  },
-    { id: 'feat_block_h264',     key: 'block_h264',      def: false },
-    { id: 'feat_block_opus',     key: 'block_opus',      def: false },
-    { id: 'feat_30fps_cap',      key: 'block_60fps',     def: true  },
-    { id: 'feat_max_720p',       key: 'max_720p',        def: false },
     { id: 'feat_ambient_off',    key: 'ambient_off',     def: true  },
     { id: 'feat_thumb_static',   key: 'thumb_static',    def: true  },
-    { id: 'feat_thumb_lowres',   key: 'thumb_lowres',    def: false },
-    { id: 'feat_pause_loops',    key: 'pause_loops',     def: true  },
     { id: 'feat_hidden_pause',   key: 'hidden_pause',    def: false },
     { id: 'feat_disable_ln',     key: 'disable_ln',      def: false },
     { id: 'feat_disable_ai_dub', key: 'disable_ai_dub',  def: true  },
@@ -27,7 +16,17 @@ const TOGGLE_MAP = [
     { id: 'feat_ab_experiments', key: 'ab_experiments',  def: false },
 ];
 
-const DEFAULTS = Object.fromEntries(TOGGLE_MAP.map(t => [t.key, t.def]));
+const SELECT_MAP = [
+    { id: 'feat_video_codec',    key: 'video_codec',     def: 'auto' }, // auto | av1 | vp9 | h264
+    { id: 'feat_audio_codec',    key: 'audio_codec',     def: 'auto' }, // auto | aac
+    { id: 'feat_max_res',        key: 'max_res',         def: 'auto' }, // auto | 1080 | 720 | 480 | 360 | 144
+    { id: 'feat_max_fps',        key: 'max_fps',         def: 'auto' }  // auto | 30
+];
+
+const DEFAULTS = {};
+TOGGLE_MAP.forEach(t => DEFAULTS[t.key] = t.def);
+SELECT_MAP.forEach(s => DEFAULTS[s.key] = s.def);
+DEFAULTS['theme'] = 'dark';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -40,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btnDetectHw.textContent = "Testando...";
             let results = [];
             
-            // Check AV1
             if (navigator.mediaCapabilities) {
                 try {
                     const av1 = await navigator.mediaCapabilities.decodingInfo({
@@ -67,55 +65,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch(e) {}
             }
             
-            hwLabel.innerHTML = `<strong>Decodificação do seu PC:</strong><br>${results.join('<br>')}<br><br><em>(Dica: Bloqueie codecs de vídeo marcados como 'Software' para evitar superaquecimento).</em>`;
+            hwLabel.innerHTML = `<strong>Suporte Físico (GPU):</strong><br>${results.join('<br>')}<br><br><em>(Evite forçar codecs marcados como Software/Não)</em>`;
             hwLabel.style.display = 'block';
             btnDetectHw.textContent = "Testado!";
         });
     }
 
-    // Load all settings and initialize toggles
-    // Ref: developer.chrome.com/docs/extensions/reference/api/storage#method-StorageArea-get
-    chrome.storage.local.get({ ...DEFAULTS, theme: 'dark' }, (stored) => {
-        for (const { id, key, def } of TOGGLE_MAP) {
+    // Load all settings and initialize UI
+    chrome.storage.local.get(DEFAULTS, (stored) => {
+        
+        // Initialize Toggles
+        for (const { id, key } of TOGGLE_MAP) {
             const el = document.getElementById(id);
             if (!el) continue;
-
-            el.checked = stored[key] ?? def;
-
-            // Write directly to storage — content_script reacts via onChanged
+            el.checked = stored[key];
             el.addEventListener('change', () => {
                 chrome.storage.local.set({ [key]: el.checked });
             });
         }
 
-        // --- SAFETY: Prevent blocking all 3 video codecs ---
-        const av1El = document.getElementById('feat_block_av1');
-        const vp9El = document.getElementById('feat_block_vp9');
-        const h264El = document.getElementById('feat_block_h264');
-
-        const enforceCodecSafety = (changedEl) => {
-            if (av1El && vp9El && h264El && av1El.checked && vp9El.checked && h264El.checked) {
-                // Desmarca outro codec automaticamente para evitar quebrar o player
-                if (changedEl === av1El) vp9El.checked = false;
-                else if (changedEl === vp9El) av1El.checked = false;
-                else if (changedEl === h264El) vp9El.checked = false;
-
-                // Atualiza o storage do codec que foi forçado a desmarcar
-                if (!vp9El.checked) chrome.storage.local.set({ block_vp9: false });
-                if (!av1El.checked) chrome.storage.local.set({ block_av1: false });
-            }
-        };
-
-        if (av1El) av1El.addEventListener('change', () => enforceCodecSafety(av1El));
-        if (vp9El) vp9El.addEventListener('change', () => enforceCodecSafety(vp9El));
-        if (h264El) h264El.addEventListener('change', () => enforceCodecSafety(h264El));
+        // Initialize Selects
+        for (const { id, key } of SELECT_MAP) {
+            const el = document.getElementById(id);
+            if (!el) continue;
+            el.value = stored[key];
+            el.addEventListener('change', () => {
+                chrome.storage.local.set({ [key]: el.value });
+            });
+        }
 
         // Theme initialization
         const themeSelector = document.getElementById('theme_selector');
         if (themeSelector) {
-            const currentTheme = stored['theme'] || 'dark';
-            themeSelector.value = currentTheme;
-            document.documentElement.setAttribute('data-theme', currentTheme);
+            themeSelector.value = stored['theme'];
+            document.documentElement.setAttribute('data-theme', stored['theme']);
             
             themeSelector.addEventListener('change', (e) => {
                 const newTheme = e.target.value;
@@ -138,17 +121,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let html = '';
-        const ruleNames = {
-            1: "QOE",
-            2: "ADS",
-            3: "LOG"
-        };
+        const ruleNames = { 1: "QOE", 2: "ADS", 3: "LOG" };
 
         allLogs.forEach(l => {
             const isError = l.ruleId === 3; 
             const ruleClass = isError ? 't-error' : 't-blocked';
             const ruleName = ruleNames[l.ruleId] || `R${l.ruleId}`;
-            // Simpler, cleaner terminal output
             html += `<div class="t-line"><span class="t-time">[${l.ts}]</span> <span class="${ruleClass}">${ruleName}</span> blocked</div>`;
         });
         logOutput.innerHTML = html;
@@ -166,9 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderLogs();
             }
         });
-    } catch(e) {
-        console.log("Debug port not available.");
-    }
+    } catch(e) {}
 
     if (btnCopy) {
         btnCopy.addEventListener('click', () => {
@@ -176,10 +152,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const textToCopy = allLogs.map(l => `[${l.ts}] Rule ${l.ruleId} BLOCKED ${l.type}: ${l.url}`).join('\n');
             navigator.clipboard.writeText(textToCopy).then(() => {
                 const oldIcon = btnCopy.textContent;
-                btnCopy.textContent = '✅';
+                btnCopy.textContent = 'Copied!';
                 setTimeout(() => { btnCopy.textContent = oldIcon; }, 1500);
             });
         });
     }
-
 });

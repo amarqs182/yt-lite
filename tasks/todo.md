@@ -23,3 +23,10 @@
 - [x] Refatorar popup.html para design minimalista
 - [x] Melhorar contrastes e simplificar as informações nas seções
 - [x] Atualizar o esquema de cores e espaçamento (CSS)
+
+## Etapa 7: Reestruturação de Opções (Select/Segmented UI)
+- [x] Agrupar Áudio e Vídeo em categorias visuais
+- [x] Transformar Codecs em Seletor (Dropdown ou Radio)
+- [x] Transformar Resolução em Seletor de múltiplas opções
+- [x] Transformar FPS em Seletor
+- [x] Atualizar scripts de background/features para aceitar valores ao invés de apenas true/false

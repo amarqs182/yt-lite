@@ -1,23 +1,18 @@
 /**
  * src/features/codec.js
- * Blocks specific codecs to force YouTube into hardware-friendly fallbacks.
- * Overrides 3 APIs used by YouTube for codec negotiation (incl. SABR):
- *   1. HTMLMediaElement.canPlayType()
- *   2. MediaSource.isTypeSupported()
- *   3. MediaCapabilities.decodingInfo()
+ * Parses the new unified dropdown options (video_codec, audio_codec, max_fps).
+ * Overrides APIs used by YouTube for codec negotiation (incl. SABR).
  */
 (function () {
     'use strict';
     
     if (window.self !== window.top || window.location.href === 'about:blank') return;
 
-    const blockAv1    = localStorage['ytl-block_av1']  === 'true';
-    const blockVp9    = localStorage['ytl-block_vp9']  === 'true';
-    const blockH264   = localStorage['ytl-block_h264'] === 'true';
-    const blockOpus   = localStorage['ytl-block_opus'] === 'true';
-    const block60fps  = localStorage['ytl-block_60fps'] !== 'false';
+    const videoPref = localStorage['ytl-video_codec'] || 'auto'; // auto, av1, vp9, h264
+    const audioPref = localStorage['ytl-audio_codec'] || 'auto'; // auto, aac
+    const maxFps    = localStorage['ytl-max_fps']     || 'auto'; // auto, 30
 
-    if (!blockAv1 && !blockVp9 && !blockH264 && !blockOpus && !block60fps) return;
+    if (videoPref === 'auto' && audioPref === 'auto' && maxFps === 'auto') return;
 
     function isBlocked(type) {
         if (!type) return false;
@@ -28,22 +23,32 @@
             return false;
         }
 
-        // Explicit logic for Audio Codecs
-        if (t.includes('opus')) return blockOpus;
-        
-        // Let generic audio (mp4a/aac) pass unless user somehow forced block all
-        if (t.startsWith('audio') || t.includes('audio/')) {
-            if (t.includes('opus')) return blockOpus;
+        // --- AUDIO ---
+        const isAudio = t.startsWith('audio') || t.includes('audio/');
+        if (isAudio || t.includes('opus') || t.includes('mp4a')) {
+            if (audioPref === 'aac') {
+                // To force AAC, we block Opus
+                if (t.includes('opus')) return true;
+            }
             return false;
         }
 
-        // Video Codecs
-        if (blockAv1 && (t.includes('av01') || t.includes('av99'))) return true;
-        if (blockVp9 && (t.includes('vp9') || t.includes('vp09') || t.includes('webm'))) return true;
-        if (blockH264 && (t.includes('avc') || t.includes('mp4v') || t.includes('h264'))) return true;
+        // --- VIDEO ---
+        if (videoPref !== 'auto') {
+            const isAv1 = t.includes('av01') || t.includes('av99');
+            const isVp9 = t.includes('vp9') || t.includes('vp09') || t.includes('webm');
+            const isH264 = t.includes('avc') || t.includes('mp4v') || t.includes('h264');
 
-        // 60fps blocker
-        if (block60fps) {
+            // If user wants AV1, block VP9 and H264
+            if (videoPref === 'av1' && (isVp9 || isH264)) return true;
+            // If user wants VP9, block AV1 and H264
+            if (videoPref === 'vp9' && (isAv1 || isH264)) return true;
+            // If user wants H264, block AV1 and VP9
+            if (videoPref === 'h264' && (isAv1 || isVp9)) return true;
+        }
+
+        // --- FPS ---
+        if (maxFps === '30') {
             const m = /framerate=(\d+)/.exec(t);
             if (m && parseInt(m[1], 10) > 30) return true;
         }
@@ -66,7 +71,7 @@
         MediaSource.isTypeSupported = makeChecker(MediaSource.isTypeSupported.bind(MediaSource));
     }
 
-    // 3. MediaCapabilities.decodingInfo (used by YouTube SABR for format negotiation)
+    // 3. MediaCapabilities.decodingInfo
     if (navigator.mediaCapabilities) {
         const origDecode = navigator.mediaCapabilities.decodingInfo.bind(navigator.mediaCapabilities);
         navigator.mediaCapabilities.decodingInfo = function (config) {
