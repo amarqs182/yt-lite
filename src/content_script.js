@@ -21,6 +21,7 @@ const DEFAULTS = {
     disable_ln:     false,
     disable_ai_dub: true,
     eco_ui:         false,
+    ab_experiments: false,
 };
 
 // Step 1 + 2: Read storage → write localStorage

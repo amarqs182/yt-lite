@@ -438,11 +438,33 @@
                 </label>
             </div>
 
+            <div class="feature-card experimental">
+                <span class="feature-icon">🧪</span>
+                <div class="feature-text">
+                    <div class="feature-label">Desativar Experimentos A/B</div>
+                    <div class="feature-desc">Congela flags experimentais para evitar carregamento de bloat extra</div>
+                </div>
+                <label class="m3-switch">
+                    <input type="checkbox" id="feat_ab_experiments">
+                    <span class="m3-track"><span class="m3-thumb">✓</span></span>
+                </label>
+            </div>
+
         </div>
 
 
     </div>
 
+    <!-- TERMINAL DEBUG (Hidden by default, can be toggled if needed but we'll show it below the scroll) -->
+    <div class="terminal-wrapper" id="debug_terminal">
+        <div class="terminal-bar">
+            <span class="terminal-bar-title">TELEMETRY_BLOCK_LOGS</span>
+            <button class="terminal-close" id="btn_copy_logs" title="Copiar Logs">📋</button>
+        </div>
+        <div class="terminal-body" id="log_output">
+            <div class="t-line t-empty">Aguardando interceptações na aba atual... <span class="t-cursor"></span></div>
+        </div>
+    </div>
 
     <script src="popup.js"></script>
 </body>

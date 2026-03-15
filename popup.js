@@ -22,6 +22,7 @@ const TOGGLE_MAP = [
     { id: 'feat_disable_ln',     key: 'disable_ln',      def: false },
     { id: 'feat_disable_ai_dub', key: 'disable_ai_dub',  def: true  },
     { id: 'feat_eco_ui',         key: 'eco_ui',          def: false },
+    { id: 'feat_ab_experiments', key: 'ab_experiments',  def: false },
 ];
 
 const DEFAULTS = Object.fromEntries(TOGGLE_MAP.map(t => [t.key, t.def]));
@@ -57,5 +58,53 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
+    // --- DEBUG TERMINAL LOGIC ---
+    const logOutput = document.getElementById('log_output');
+    const btnCopy = document.getElementById('btn_copy_logs');
+    let allLogs = [];
+
+    function renderLogs() {
+        if (!logOutput) return;
+        if (allLogs.length === 0) {
+            logOutput.innerHTML = '<div class="t-line t-empty">Aguardando bloqueios (recarregue a página)... <span class="t-cursor"></span></div>';
+            return;
+        }
+
+        let html = '';
+        allLogs.forEach(l => {
+            const ruleColor = l.ruleId === 3 ? 'error' : 'warn'; // Rule 3 = log_event
+            html += `<div class="t-line"><span class="t-ts">[${l.ts}]</span> <span class="t-msg ${ruleColor}">BLOCKED: ${l.url}</span></div>`;
+        });
+        logOutput.innerHTML = html;
+    }
+
+    try {
+        const port = chrome.runtime.connect({ name: 'yt-lite-debug' });
+        port.onMessage.addListener((msg) => {
+            if (msg.type === 'history') {
+                allLogs = msg.logs;
+                renderLogs();
+            } else if (msg.type === 'new_log') {
+                allLogs.unshift(msg.log);
+                if (allLogs.length > 50) allLogs.pop();
+                renderLogs();
+            }
+        });
+    } catch(e) {
+        console.log("Debug port not available.");
+    }
+
+    if (btnCopy) {
+        btnCopy.addEventListener('click', () => {
+            if (allLogs.length === 0) return;
+            const textToCopy = allLogs.map(l => `[${l.ts}] Rule ${l.ruleId} BLOCKED ${l.type}: ${l.url}`).join('\n');
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const oldIcon = btnCopy.textContent;
+                btnCopy.textContent = '✅';
+                setTimeout(() => { btnCopy.textContent = oldIcon; }, 1500);
+            });
+        });
+    }
 
 });

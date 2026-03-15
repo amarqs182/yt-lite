@@ -4,25 +4,26 @@
   "version": "1.0.0",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
-
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16":  "images/icon16.png",
-      "48":  "images/icon48.png",
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
       "128": "images/icon128.png"
     },
-    "default_title": "YT Lite - Otimizações Extremas"
+    "default_title": "YT Lite - Extreme Optimizations"
   },
   "icons": {
-    "16":  "images/icon16.png",
-    "48":  "images/icon48.png",
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
     "128": "images/icon128.png"
   },
-
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*"],
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.youtube-nocookie.com/*"
+      ],
       "js": [
         "src/features/codec.js",
         "src/features/ambient.js",
@@ -30,20 +31,46 @@
         "src/features/ai_dub.js",
         "src/features/audio_ln.js",
         "src/features/pause.js",
-        "src/features/eco.js"
+        "src/features/eco.js",
+        "src/features/experiments.js"
       ],
       "run_at": "document_start",
       "world": "MAIN",
       "all_frames": false
     },
     {
-      "matches": ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*"],
-      "js": ["src/content_script.js"],
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.youtube-nocookie.com/*"
+      ],
+      "js": [
+        "src/content_script.js"
+      ],
       "run_at": "document_start",
       "world": "ISOLATED",
       "all_frames": false
     }
   ],
-
-  "permissions": ["storage"]
+  "permissions": [
+    "storage",
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback",
+    "alarms"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.youtube-nocookie.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "telemetry_blocker",
+        "enabled": true,
+        "path": "src/rules.json"
+      }
+    ]
+  }
 }
