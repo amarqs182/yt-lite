@@ -1,8 +1,8 @@
 /**
  * src/features/enhancer.js
  * Premium Visual and Audio Enhancements for High Mode.
- * Trusted Types Compliant: No innerHTML used.
- * Cinematic Refinement: High-Fidelity Animated Film Grain & Professional Tone Mapping.
+ * Trusted Types Compliant: No innerHTML or unsafe assignments.
+ * Professional Features: SVG Convolution Sharpen, Tonal HDR, and Animated Canvas Film Grain.
  */
 
 (function() {
@@ -12,73 +12,92 @@
 
     const getS = (k) => document.documentElement.getAttribute('data-ytl-' + k) === 'true';
 
-    // --- 1. SVG FILTERS (Safe DOM Construction) ---
+    // --- 1. SVG SHARPEN FILTER (Safe DOM) ---
     const injectSVG = () => {
         const id = 'ytl-svg-defs';
         if (document.getElementById(id)) return;
-
         const ns = "http://www.w3.org/2000/svg";
         const svg = document.createElementNS(ns, "svg");
         svg.id = id;
         svg.setAttribute('style', 'display:none');
-
         const defs = document.createElementNS(ns, "defs");
-
-        // A. Sharpen Filter (Convolution Matrix)
-        const sharpen = document.createElementNS(ns, "filter");
-        sharpen.id = "ytl-sharpen";
-        const convolve = document.createElementNS(ns, "feConvolveMatrix");
-        convolve.setAttribute("order", "3");
-        convolve.setAttribute("preserveAlpha", "true");
-        convolve.setAttribute("kernelMatrix", "0 -1 0 -1 5 -1 0 -1 0");
-        sharpen.appendChild(convolve);
-        defs.appendChild(sharpen);
-
-        // B. Professional Animated Grain Filter
-        const grain = document.createElementNS(ns, "filter");
-        grain.id = "ytl-grain";
-        
-        const turb = document.createElementNS(ns, "feTurbulence");
-        turb.id = "ytl-grain-turb";
-        turb.setAttribute("type", "fractalNoise");
-        // baseFrequency 0.6 - 0.9 for fine 35mm grain
-        turb.setAttribute("baseFrequency", "0.75");
-        turb.setAttribute("numOctaves", "3");
-        turb.setAttribute("stitchTiles", "stitch");
-        grain.appendChild(turb);
-
-        const sat = document.createElementNS(ns, "feColorMatrix");
-        sat.setAttribute("type", "saturate");
-        sat.setAttribute("values", "0");
-        grain.appendChild(sat);
-
-        // Professional Tone Mapping: Grain is more visible in midtones/shadows
-        const trans = document.createElementNS(ns, "feComponentTransfer");
-        const funcA = document.createElementNS(ns, "feFuncA");
-        funcA.setAttribute("type", "table");
-        // Values: Grain intensity mapped across brightness. 
-        // We reduce it at 0.0 (deep blacks) and 1.0 (highlights) for realism.
-        funcA.setAttribute("tableValues", "0 0.15 0.20 0.15 0.05"); 
-        trans.appendChild(funcA);
-        grain.appendChild(trans);
-
-        const comp = document.createElementNS(ns, "feComposite");
-        comp.setAttribute("operator", "in");
-        comp.setAttribute("in2", "SourceGraphic");
-        grain.appendChild(comp);
-
-        defs.appendChild(grain);
+        const filter = document.createElementNS(ns, "filter");
+        filter.id = "ytl-sharpen";
+        const matrix = document.createElementNS(ns, "feConvolveMatrix");
+        matrix.setAttribute("order", "3");
+        matrix.setAttribute("preserveAlpha", "true");
+        matrix.setAttribute("kernelMatrix", "0 -1 0 -1 5 -1 0 -1 0");
+        filter.appendChild(matrix);
+        defs.appendChild(filter);
         svg.appendChild(defs);
-
-        const target = document.body || document.documentElement;
-        target.appendChild(svg);
+        (document.body || document.documentElement).appendChild(svg);
     };
 
-    // --- 2. VISUAL ENGINE ---
-    let grainSeed = 0;
+    // --- 2. PROFESSIONAL CANVAS GRAIN ---
+    let grainCanvas = null;
+    let grainCtx = null;
+    let grainFrames = [];
+    let currentFrame = 0;
     let grainInterval = null;
 
-    const updateUI = () => {
+    const initGrain = () => {
+        if (grainFrames.length > 0) return;
+        // Pre-generate 10 frames of 256x256 monochromatic noise patterns
+        for (let f = 0; f < 10; f++) {
+            const canvas = document.createElement('canvas');
+            canvas.width = canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.createImageData(256, 256);
+            const data = imgData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const val = 128 + (Math.random() - 0.5) * 50; // Subtle intensity
+                data[i] = data[i+1] = data[i+2] = val;
+                data[i+3] = 255;
+            }
+            ctx.putImageData(imgData, 0, 0);
+            grainFrames.push(canvas);
+        }
+    };
+
+    const updateGrain = () => {
+        const useGrain = getS('enhance_grain');
+        const player = document.querySelector('#movie_player') || document.querySelector('.html5-video-container');
+        
+        if (!useGrain) {
+            if (grainCanvas) grainCanvas.style.display = 'none';
+            if (grainInterval) { clearInterval(grainInterval); grainInterval = null; }
+            return;
+        }
+
+        initGrain();
+
+        if (!grainCanvas) {
+            grainCanvas = document.createElement('canvas');
+            grainCanvas.id = 'ytl-grain-canvas';
+            grainCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;mix-blend-mode:overlay;opacity:0.15;';
+            player.appendChild(grainCanvas);
+            grainCtx = grainCanvas.getContext('2d');
+        }
+
+        grainCanvas.style.display = 'block';
+        
+        if (!grainInterval) {
+            grainInterval = setInterval(() => {
+                if (!getS('enhance_grain')) return;
+                const w = grainCanvas.width = grainCanvas.clientWidth;
+                const h = grainCanvas.height = grainCanvas.clientHeight;
+                if (w === 0 || h === 0) return;
+
+                currentFrame = (currentFrame + 1) % grainFrames.length;
+                const pattern = grainCtx.createPattern(grainFrames[currentFrame], 'repeat');
+                grainCtx.fillStyle = pattern;
+                grainCtx.fillRect(0, 0, w, h);
+            }, 42); // 24fps
+        }
+    };
+
+    // --- 3. VISUAL FILTERS ---
+    const updateVisuals = () => {
         injectSVG();
         const styleId = 'ytl-premium-styles';
         let style = document.getElementById(styleId);
@@ -90,10 +109,10 @@
 
         const useHDR = getS('enhance_hdr');
         const useSharp = getS('enhance_sharpness');
-        const useGrain = getS('enhance_grain');
 
         let filters = [];
-        if (useHDR) filters.push('contrast(1.06) saturate(1.10) brightness(1.01)');
+        // Natural HDR: Toned down to avoid overlap with sharpen
+        if (useHDR) filters.push('contrast(1.04) saturate(1.08) brightness(1.01)');
         if (useSharp) filters.push('url(#ytl-sharpen)');
 
         style.textContent = `
@@ -101,42 +120,11 @@
                 filter: ${filters.length ? filters.join(' ') : 'none'} !important;
                 will-change: filter;
             }
-            .ytl-grain-overlay {
-                position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-                pointer-events: none; z-index: 10;
-                filter: url(#ytl-grain);
-                display: ${useGrain ? 'block' : 'none'};
-                mix-blend-mode: overlay;
-                opacity: 0.6; /* Balanced for professional look */
-            }
         `;
-
-        // Ensure grain div exists
-        const container = document.querySelector('.html5-video-container');
-        if (container && !document.querySelector('.ytl-grain-overlay')) {
-            const grain = document.createElement('div');
-            grain.className = 'ytl-grain-overlay';
-            container.appendChild(grain);
-        }
-
-        // Animation Loop for Real Grain (only when enabled)
-        if (useGrain) {
-            if (!grainInterval) {
-                grainInterval = setInterval(() => {
-                    const turb = document.getElementById('ytl-grain-turb');
-                    if (turb) {
-                        grainSeed = (grainSeed + 1) % 1000;
-                        turb.setAttribute('seed', grainSeed.toString());
-                    }
-                }, 41); // ~24fps for cinematic noise feel
-            }
-        } else if (grainInterval) {
-            clearInterval(grainInterval);
-            grainInterval = null;
-        }
+        updateGrain();
     };
 
-    // --- 3. AUDIO ENGINE ---
+    // --- 4. AUDIO ENGINE (Live Bypass) ---
     let audioCtx, source, bass, treble, comp, gain;
 
     const updateAudio = () => {
@@ -146,10 +134,14 @@
 
         if (video.ytlAudioHooked) {
             const r = 0.1;
-            if (bass) bass.gain.setTargetAtTime(active ? 3 : 0, 0, r);
+            // Immediate neutral bypass when inactive
+            if (bass)   bass.gain.setTargetAtTime(active ? 3.5 : 0, 0, r);
             if (treble) treble.gain.setTargetAtTime(active ? 4.5 : 0, 0, r);
-            if (gain) gain.gain.setTargetAtTime(active ? 1.1 : 1, 0, r);
-            if (comp) comp.threshold.setTargetAtTime(active ? -22 : 0, 0, r);
+            if (gain)   gain.gain.setTargetAtTime(active ? 1.15 : 1, 0, r);
+            if (comp) {
+                comp.threshold.setTargetAtTime(active ? -22 : 0, 0, r);
+                comp.ratio.setTargetAtTime(active ? 3 : 1, 0, r);
+            }
             return;
         }
 
@@ -170,17 +162,15 @@
             gain.connect(audioCtx.destination);
 
             video.ytlAudioHooked = true;
-            updateAudio();
+            setTimeout(updateAudio, 100);
         } catch(e) {}
     };
 
-    const run = () => { updateUI(); updateAudio(); };
+    const run = () => { updateVisuals(); updateAudio(); };
     window.addEventListener('yt-lite-sync', run);
-    window.addEventListener('yt-navigate-finish', () => setTimeout(run, 1000));
-    document.addEventListener('click', () => {
-        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-    });
+    window.addEventListener('yt-navigate-finish', () => setTimeout(run, 1500));
+    document.addEventListener('click', () => audioCtx?.state === 'suspended' && audioCtx.resume());
     
-    setInterval(run, 3000);
+    setInterval(run, 4000);
     run();
 })();
