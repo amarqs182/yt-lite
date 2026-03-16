@@ -1,8 +1,7 @@
 /**
  * src/features/enhancer.js
  * Premium Visual and Audio Enhancements for High Mode.
- * Trusted Types Compliant: No innerHTML used.
- * Improved: Robust Canvas Grain & Instant Audio Engine.
+ * Corrected: Grain is fully visible (high z-index), Audio is restored and stable.
  */
 
 (function() {
@@ -34,7 +33,7 @@
         (document.body || document.documentElement).appendChild(svg);
     };
 
-    // --- 2. IMPROVED CANVAS GRAIN ENGINE ---
+    // --- 2. PRO CANVAS GRAIN ENGINE ---
     let grainCanvas = null;
     let grainCtx = null;
     let grainFrames = [];
@@ -51,7 +50,7 @@
             const data = imgData.data;
             for (let i = 0; i < data.length; i += 4) {
                 const val = Math.floor(Math.random() * 255);
-                data[i] = data[i+1] = data[i+2] = val; // Mono
+                data[i] = data[i+1] = data[i+2] = val;
                 data[i+3] = 255;
             }
             ctx.putImageData(imgData, 0, 0);
@@ -62,8 +61,6 @@
     const updateGrain = () => {
         const useGrain = getB('enhance_grain');
         const intensity = (parseInt(getS('grain_intensity') || '15', 10)) / 100;
-        
-        // Target movie_player for best coverage
         const player = document.getElementById('movie_player');
         
         if (!useGrain || !player) {
@@ -77,7 +74,6 @@
         if (!grainCanvas) {
             grainCanvas = document.createElement('canvas');
             grainCanvas.id = 'ytl-grain-canvas';
-            // Max Z-index, pointer-events none to prevent click interference
             grainCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2147483647;mix-blend-mode:overlay;';
             player.appendChild(grainCanvas);
             grainCtx = grainCanvas.getContext('2d');
@@ -89,15 +85,11 @@
         if (!grainInterval) {
             grainInterval = setInterval(() => {
                 if (!getB('enhance_grain')) return;
-                
-                // Sync size
                 if (grainCanvas.width !== player.offsetWidth || grainCanvas.height !== player.offsetHeight) {
                     grainCanvas.width = player.offsetWidth;
                     grainCanvas.height = player.offsetHeight;
                 }
-                
                 if (grainCanvas.width === 0) return;
-
                 currentFrame = (currentFrame + 1) % grainFrames.length;
                 const pattern = grainCtx.createPattern(grainFrames[currentFrame], 'repeat');
                 grainCtx.fillStyle = pattern;
@@ -133,35 +125,32 @@
         updateGrain();
     };
 
-    // --- 4. AUDIO ENGINE (Crossfade Logic) ---
-    let audioCtx, source, bassNode, trebleNode, compressorNode, dryNode, wetNode;
+    // --- 4. AUDIO ENGINE (Stable Restoration) ---
+    let audioCtx, source, bass, treble, compressor, mainGain;
 
     const setupAudio = (video) => {
-        if (video.ytlAudioHooked) return;
+        if (video.ytLiteAudioHooked) return;
         try {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             source = audioCtx.createMediaElementSource(video);
             
-            bassNode = audioCtx.createBiquadFilter(); bassNode.type = "lowshelf"; bassNode.frequency.value = 150;
-            trebleNode = audioCtx.createBiquadFilter(); trebleNode.type = "highshelf"; trebleNode.frequency.value = 4500;
-            compressorNode = audioCtx.createDynamicsCompressor();
-            compressorNode.threshold.value = -22;
-            compressorNode.ratio.value = 3;
+            bass = audioCtx.createBiquadFilter(); bass.type = "lowshelf"; bass.frequency.value = 150;
+            treble = audioCtx.createBiquadFilter(); treble.type = "highshelf"; treble.frequency.value = 4500;
+            compressor = audioCtx.createDynamicsCompressor();
+            mainGain = audioCtx.createGain();
 
-            dryNode = audioCtx.createGain();
-            wetNode = audioCtx.createGain();
+            // Simple Serial Chain: Source -> Bass -> Treble -> Comp -> Gain -> Out
+            source.connect(bass);
+            bass.connect(treble);
+            treble.connect(compressor);
+            compressor.connect(mainGain);
+            mainGain.connect(audioCtx.destination);
 
-            source.connect(dryNode);
-            dryNode.connect(audioCtx.destination);
-
-            source.connect(bassNode);
-            bassNode.connect(trebleNode);
-            trebleNode.connect(compressorNode);
-            compressorNode.connect(wetNode);
-            wetNode.connect(audioCtx.destination);
-
-            video.ytlAudioHooked = true;
-        } catch(e) {}
+            video.ytLiteAudioHooked = true;
+            console.log("YT Lite: Audio System Hooked");
+        } catch(e) {
+            console.warn("YT Lite: Audio CORS restricted.");
+        }
     };
 
     const updateAudioLive = () => {
@@ -169,21 +158,26 @@
         const video = document.querySelector('video');
         if (!video) return;
 
-        if (!video.ytlAudioHooked) setupAudio(video);
-        if (!video.ytlAudioHooked) return;
+        if (!video.ytLiteAudioHooked) setupAudio(video);
+        if (!video.ytLiteAudioHooked) return;
 
         const ramp = 0.1;
-        if (dryNode) dryNode.gain.setTargetAtTime(active ? 0 : 1, 0, ramp);
-        if (wetNode) wetNode.gain.setTargetAtTime(active ? 1 : 0, 0, ramp);
-        if (audioCtx?.state === 'suspended') audioCtx.resume();
+        // If active, apply boosts. If inactive, go to neutral (0 gain / 1.0 main volume)
+        if (bass) bass.gain.setTargetAtTime(active ? 3.5 : 0, 0, ramp);
+        if (treble) treble.gain.setTargetAtTime(active ? 4.5 : 0, 0, ramp);
+        if (mainGain) mainGain.gain.setTargetAtTime(active ? 1.15 : 1.0, 0, ramp);
+        if (compressor) {
+            compressor.threshold.setTargetAtTime(active ? -22 : 0, 0, ramp);
+            compressor.ratio.setTargetAtTime(active ? 3 : 1, 0, ramp);
+        }
+
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     };
 
     const run = () => { updateVisuals(); updateAudioLive(); };
     window.addEventListener('yt-lite-sync', run);
     window.addEventListener('yt-navigate-finish', () => setTimeout(run, 1500));
-    document.addEventListener('click', () => {
-        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-    });
+    document.addEventListener('click', () => audioCtx?.state === 'suspended' && audioCtx.resume());
     
     setInterval(run, 4000);
     run();
