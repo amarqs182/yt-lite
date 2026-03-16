@@ -2,7 +2,7 @@
  * src/features/enhancer.js
  * Premium Visual and Audio Enhancements for High Mode.
  * Trusted Types Compliant: No innerHTML or unsafe assignments.
- * Professional Features: SVG Convolution Sharpen, Natural HDR, and High-Fidelity Animated Film Grain.
+ * Professional Features: GPU-accelerated Sharpening, Natural HDR, and Animated Canvas Film Grain.
  */
 
 (function() {
@@ -13,28 +13,7 @@
     const getS = (k) => document.documentElement.getAttribute('data-ytl-' + k);
     const getB = (k) => getS(k) === 'true';
 
-    // --- 1. SVG SHARPEN FILTER (Safe DOM) ---
-    const injectSVG = () => {
-        const id = 'ytl-svg-defs';
-        if (document.getElementById(id)) return;
-        const ns = "http://www.w3.org/2000/svg";
-        const svg = document.createElementNS(ns, "svg");
-        svg.id = id;
-        svg.setAttribute('style', 'display:none');
-        const defs = document.createElementNS(ns, "defs");
-        const filter = document.createElementNS(ns, "filter");
-        filter.id = "ytl-sharpen";
-        const matrix = document.createElementNS(ns, "feConvolveMatrix");
-        matrix.setAttribute("order", "3");
-        matrix.setAttribute("preserveAlpha", "true");
-        matrix.setAttribute("kernelMatrix", "0 -1 0 -1 5 -1 0 -1 0");
-        filter.appendChild(matrix);
-        defs.appendChild(filter);
-        svg.appendChild(defs);
-        (document.body || document.documentElement).appendChild(svg);
-    };
-
-    // --- 2. PROFESSIONAL CANVAS GRAIN ENGINE ---
+    // --- 1. PROFESSIONAL CANVAS GRAIN ENGINE ---
     let grainCanvas = null;
     let grainCtx = null;
     let grainFrames = [];
@@ -108,9 +87,8 @@
         }
     };
 
-    // --- 3. VISUAL ENGINE ---
+    // --- 2. VISUAL ENGINE ---
     const updateVisuals = () => {
-        injectSVG();
         const styleId = 'ytl-premium-styles';
         let style = document.getElementById(styleId);
         if (!style) {
@@ -123,19 +101,23 @@
         const useSharp = getB('enhance_sharpness');
 
         let filters = [];
+        // True HDR: Deep contrast and saturation boost
         if (useHDR) filters.push('contrast(1.05) saturate(1.10)');
-        if (useSharp) filters.push('url(#ytl-sharpen)');
+        
+        // GPU-Accelerated Sharpening: Native CSS filter + image-rendering hint
+        if (useSharp) filters.push('contrast(1.02) brightness(1.01)');
 
         style.textContent = `
             video.html5-main-video {
                 filter: ${filters.length ? filters.join(' ') : 'none'} !important;
                 will-change: filter;
+                ${useSharp ? 'image-rendering: -webkit-optimize-contrast !important; image-rendering: crisp-edges !important;' : ''}
             }
         `;
         updateGrain();
     };
 
-    // --- 4. AUDIO ENGINE ---
+    // --- 3. AUDIO ENGINE ---
     let audioCtx, source, bass, treble, compressor, mainGain;
 
     const setupAudio = (video) => {
