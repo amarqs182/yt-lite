@@ -10,20 +10,20 @@
 
     if (window.self !== window.top || window.location.href === 'about:blank') return;
 
-    const getS = (k) => document.documentElement.getAttribute('data-ytl-' + k);
+    const getS = (k) => document.documentElement.getAttribute('data-ytb-' + k);
     const getB = (k) => getS(k) === 'true';
 
     // --- 1. SVG SHARPEN FILTER ---
     const injectSVG = () => {
-        if (document.getElementById('ytl-svg-defs')) return;
+        if (document.getElementById('ytb-svg-defs')) return;
         const ns = "http://www.w3.org/2000/svg";
         const svg = document.createElementNS(ns, "svg");
-        svg.id = 'ytl-svg-defs';
+        svg.id = 'ytb-svg-defs';
         svg.setAttribute('style', 'display:none;position:absolute;width:0;height:0');
 
         const defs = document.createElementNS(ns, "defs");
         const filter = document.createElementNS(ns, "filter");
-        filter.id = "ytl-sharpen";
+        filter.id = "ytb-sharpen";
 
         const matrix = document.createElementNS(ns, "feConvolveMatrix");
         matrix.setAttribute("order", "3");
@@ -83,7 +83,7 @@
 
         if (!grainCanvas) {
             grainCanvas = document.createElement('canvas');
-            grainCanvas.id = 'ytl-grain-canvas';
+            grainCanvas.id = 'ytb-grain-canvas';
             grainCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2147483647;mix-blend-mode:soft-light;';
             player.appendChild(grainCanvas);
             grainCtx = grainCanvas.getContext('2d');
@@ -115,7 +115,7 @@
     const updateVisuals = () => {
         injectSVG();
 
-        const styleId = 'ytl-premium-styles';
+        const styleId = 'ytb-premium-styles';
         let style = document.getElementById(styleId);
         if (!style) {
             style = document.createElement('style');
@@ -128,7 +128,7 @@
 
         let filters = [];
         if (useHDR) filters.push('contrast(1.05) saturate(1.10)');
-        if (useSharp) filters.push('url(#ytl-sharpen)');
+        if (useSharp) filters.push('url(#ytb-sharpen)');
 
         style.textContent = `
             video.html5-main-video {
@@ -183,8 +183,13 @@
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     };
 
-    const run = () => { updateVisuals(); updateAudioLive(); };
-    window.addEventListener('yt-lite-sync', run);
+    const run = () => {
+        // Skip all processing if audio-only background mode is active
+        if (document.documentElement.getAttribute('data-ytb-bg_active') === 'true') return;
+        updateVisuals();
+        updateAudioLive();
+    };
+    window.addEventListener('yt-bettr-sync', run);
     window.addEventListener('yt-navigate-finish', () => setTimeout(run, 1500));
     document.addEventListener('click', () => audioCtx?.state === 'suspended' && audioCtx.resume());
 

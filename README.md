@@ -1,12 +1,12 @@
-# ytライト🌱 (YT Lite) 🪶 ▶🚀
+# ytライト🌱 (yt bettr) 🪶 ▶🚀
 
-**YT Lite** é um otimizador refinado e de alta estabilidade para YouTube, focado em entregar a melhor performance e qualidade visual sem comprometer a experiência do usuário. Diferente de outras extensões, o YT Lite utiliza detecção profunda de hardware para servir os streams de vídeo mais eficientes para o seu PC.
+**yt bettr** é um otimizador refinado e de alta estabilidade para YouTube, focado em entregar a melhor performance e qualidade visual sem comprometer a experiência do usuário. Diferente de outras extensões, o yt bettr utiliza detecção profunda de hardware para servir os streams de vídeo mais eficientes para o seu PC.
 
 ---
 
-## 🎮 Modos de Operação (YT Lite Auto)
+## 🎮 Modos de Operação (yt bettr Auto)
 
-O YT Lite se adapta instantaneamente às suas necessidades através de três perfis inteligentes:
+O yt bettr se adapta instantaneamente às suas necessidades através de três perfis inteligentes:
 
 - **Auto Lite:** Focado em economia extrema. Força o uso de H.264, limita a resolução a 480p/30fps e ativa todas as otimizações de interface para preservar CPU e bateria.
 - **Auto High:** A experiência Premium. Libera AV1 (se suportado por hardware), resoluções até 4K/60fps e ativa automaticamente os filtros visuais e de áudio de alta fidelidade.
@@ -27,7 +27,7 @@ Eleve a sua experiência de visualização com processamento de imagem e som de 
 
 ## ⚡ Performance e Economia (Eco Mode)
 
-- **Bloqueador de Telemetria:** Interceptação em nível de rede via `declarativeNetRequest` de requisições pesadas de coleta de dados (`log_event`, `stats/qoe`, `stats/ads`).
+- **Capas Estáticas & Básicas:** Remove as capas animadas (`ytd-moving-thumbnail-renderer`) e imagens de alta resolução.
 - **Otimização de Loops:** Intercepta o `requestVideoFrameCallback` para pausar loops de renderização inúteis quando o vídeo está parado, reduzindo o uso de CPU a quase zero.
 - **Modo OLED Real:** Força o fundo da página do YouTube para preto puro (#000000), economizando energia em telas OLED/AMOLED.
 - **Eco UI Extremo:** Remove animações pesadas, esconde Shorts e limpa elementos de interface que poluem a DOM e consomem recursos.
@@ -50,7 +50,7 @@ Eleve a sua experiência de visualização com processamento de imagem e som de 
 3. Navegue até `chrome://extensions/`.
 4. Ative o **Modo do Desenvolvedor** (canto superior direito).
 5. Clique em **Carregar sem pacote** e selecione a pasta do projeto.
-6. O ícone do **YT Lite ▶🚀** aparecerá na sua barra de ferramentas.
+6. O ícone do **yt bettr ▶🚀** aparecerá na sua barra de ferramentas.
 
 ---
 

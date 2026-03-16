@@ -14,7 +14,7 @@
       "message": "Block 60fps video"
    },
    "optionsEnable": {
-      "message": "Enable YT Lite"
+      "message": "Enable yt bettr"
    },
    "optionsBlockAV1": {
       "message": "Block AV1"
@@ -38,7 +38,7 @@
       "message": "Disable Loudness Normalization"
    },
    "optionsTitle": {
-      "message": "YT Lite ▶🚀"
+      "message": "yt bettr ▶🚀"
    },
    "optionsTitleAudio": {
       "message": "Audio"

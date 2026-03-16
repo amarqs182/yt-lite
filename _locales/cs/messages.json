@@ -8,7 +8,7 @@
       "message": "Blokovat 60fps videa"
    },
    "optionsEnable": {
-      "message": "Povolit YT Lite"
+      "message": "Povolit yt bettr"
    },
    "optionsBlockAV1": {
       "message": "Blokovat AV1"
@@ -32,7 +32,7 @@
       "message": "Zakázat normalizaci hlasitosti"
    },
    "optionsTitle": {
-      "message": "Možnosti YT Lite ▶🚀"
+      "message": "Možnosti yt bettr ▶🚀"
    },
    "optionsTitleAudio": {
       "message": "Zvuk"

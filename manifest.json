@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "YT Lite",
+  "name": "yt bettr",
   "version": "1.0.0",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
@@ -11,7 +11,7 @@
       "48": "images/icon48.png",
       "128": "images/icon128.png"
     },
-    "default_title": "YT Lite - Extreme Optimizations"
+    "default_title": "yt bettr - Extreme Optimizations"
   },
   "icons": {
     "16": "images/icon16.png",
@@ -33,6 +33,7 @@
         "src/features/pause.js",
         "src/features/eco.js",
         "src/features/experiments.js",
+        "src/features/audio_bg.js",
         "src/features/enhancer.js"
       ],
       "run_at": "document_start",
@@ -54,24 +55,10 @@
   ],
   "permissions": [
     "storage",
-    "declarativeNetRequest",
-    "declarativeNetRequestFeedback",
     "alarms"
   ],
   "host_permissions": [
     "*://*.youtube.com/*",
     "*://*.youtube-nocookie.com/*"
-  ],
-  "background": {
-    "service_worker": "src/background.js"
-  },
-  "declarative_net_request": {
-    "rule_resources": [
-      {
-        "id": "telemetry_blocker",
-        "enabled": true,
-        "path": "src/rules.json"
-      }
-    ]
-  }
+  ]
 }

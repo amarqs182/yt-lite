@@ -8,10 +8,10 @@
 
     if (window.self !== window.top || window.location.href === 'about:blank') return;
 
-    const getS = (k) => document.documentElement.getAttribute('data-ytl-' + k) === 'true';
+    const getS = (k) => document.documentElement.getAttribute('data-ytb-' + k) === 'true';
 
     const applyStyles = () => {
-        const id = 'yt-lite-eco-styles';
+        const id = 'yt-bettr-eco-styles';
         let style = document.getElementById(id);
         if (!style) {
             style = document.createElement('style');
@@ -26,12 +26,31 @@
             // This needs URL interception usually, but we can try CSS trick for sizing
         }
 
-        // 2. Extreme Eco UI
+        // 1. Static Thumbnails (block video preview on hover)
+        if (getS('thumb_static')) {
+            css += `
+                #mouseover-overlay, ytd-moving-thumbnail-renderer { display: none !important; }
+            `;
+        }
+
+        // 2. Extreme Eco UI (animations + heavy elements only)
         if (getS('eco_ui')) {
             css += `
-                ytd-rich-section-renderer, ytd-reel-shelf-renderer, #shorts-container,
-                #comments, #chat, #chat-container, ytd-live-chat-frame { display: none !important; }
                 * { animation: none !important; transition: none !important; }
+            `;
+        }
+
+        // 2b. Hide Comments & Chat
+        if (getS('hide_comments')) {
+            css += `
+                #comments, #chat, #chat-container, ytd-live-chat-frame { display: none !important; }
+            `;
+        }
+
+        // 2c. Hide Shorts
+        if (getS('hide_shorts')) {
+            css += `
+                ytd-rich-section-renderer, ytd-reel-shelf-renderer, #shorts-container { display: none !important; }
             `;
         }
 
@@ -44,7 +63,7 @@
         }
 
         // 4. OLED Theme
-        if (document.documentElement.getAttribute('data-ytl-theme') === 'amoled') {
+        if (document.documentElement.getAttribute('data-ytb-theme') === 'amoled') {
             css += `
                 html, body, ytd-app, ytd-masthead, #masthead-container.ytd-app, #columns.ytd-watch-flexy { background-color: #000000 !important; }
                 ytd-guide-renderer, #background.ytd-masthead, .ytp-panel-menu { background-color: #000000 !important; }
@@ -54,6 +73,6 @@
         style.textContent = css;
     };
 
-    window.addEventListener('yt-lite-sync', applyStyles);
+    window.addEventListener('yt-bettr-sync', applyStyles);
     applyStyles();
 })();

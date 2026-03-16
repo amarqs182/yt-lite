@@ -14,7 +14,7 @@
       "message": "Bloquear vídeo em 60fps"
    },
    "optionsEnable": {
-      "message": "Ativar YT Lite"
+      "message": "Ativar yt bettr"
    },
    "optionsBlockAV1": {
       "message": "Bloquear AV1"
@@ -38,7 +38,7 @@
       "message": "Desativar Normalização de Volume"
    },
    "optionsTitle": {
-      "message": "YT Lite ▶🚀"
+      "message": "yt bettr ▶🚀"
    },
    "optionsTitleAudio": {
       "message": "Áudio"

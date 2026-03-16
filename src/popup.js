@@ -1,5 +1,5 @@
 /**
- * popup.js — YT Lite
+ * popup.js — yt bettr
  * Mode Selection: Lite | High | Custom
  * Slider handling for Grain intensity.
  */
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Terminal
     const logOutput = document.getElementById('log_output');
     try {
-        const port = chrome.runtime.connect({ name: 'yt-lite-debug' });
+        const port = chrome.runtime.connect({ name: 'yt-bettr-debug' });
         port.onMessage.addListener((msg) => {
             if (msg.type === 'history' || msg.type === 'new_log') {
                 if (logOutput.textContent.includes('Aguardando')) logOutput.innerHTML = '';

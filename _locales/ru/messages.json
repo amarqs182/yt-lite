@@ -7,7 +7,7 @@
       "message": "Блокировать 60к/с видео"
    },
    "optionsEnable": {
-      "message": "Включить YT Lite"
+      "message": "Включить yt bettr"
    },
    "optionsBlockAV1": {
       "message": "Блокировать AV1"
@@ -31,7 +31,7 @@
       "message": "Выключить нормализацию громкости"
    },
    "optionsTitle": {
-      "message": "YT Lite ▶🚀"
+      "message": "yt bettr ▶🚀"
    },
    "optionsTitleAudio": {
       "message": "Аудио"

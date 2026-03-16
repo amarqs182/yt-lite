@@ -1,548 +1,712 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
-    <meta charset="utf-8">
-    <title>YT Lite</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=360, initial-scale=1.0">
+    <title>yt bettr</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-
-        /* === Minimalist Design Tokens === */
         :root {
-            /* Light Theme (Default) */
-            --bg-base: #FFFFFF;
-            --bg-surface: #F9FAFB;
+            --bg-base: #0A0A0F;
+            --bg-surface: #141419;
+            --bg-elevated: #1E1E26;
+            --border: #2A2A35;
+            --text-primary: #F5F5F7;
+            --text-muted: #71717A;
+
+            --accent: #22C55E; /* Lite / Default */
+            --accent-lite: #22C55E;
+            --accent-high: #A855F7;
+            --accent-custom: #F59E0B;
+            
+            --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-base: #FAFAFA;
+            --bg-surface: #FFFFFF;
             --bg-elevated: #F3F4F6;
-            --text-primary: #111827;
-            --text-secondary: #6B7280;
-            --text-tertiary: #9CA3AF;
-            --border-color: #E5E7EB;
-            --accent-color: #10B981; /* Minimalist Green */
-            --accent-hover: #059669;
-            --danger-color: #EF4444;
-            --danger-bg: #FEF2F2;
-
-            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-full: 9999px;
+            --border: #E4E4E7;
+            --text-primary: #0A0A0F;
+            --text-muted: #52525B;
         }
 
-        :root[data-theme="dark"] {
-            --bg-base: #0F1115;
-            --bg-surface: #16181D;
-            --bg-elevated: #1F2229;
-            --text-primary: #F3F4F6;
-            --text-secondary: #9CA3AF;
-            --text-tertiary: #6B7280;
-            --border-color: #2D3139;
-            --accent-color: #10B981;
-            --danger-color: #F87171;
-            --danger-bg: rgba(239, 68, 68, 0.1);
-        }
-
-        :root[data-theme="amoled"] {
+        [data-theme="amoled"] {
             --bg-base: #000000;
-            --bg-surface: #090909;
-            --bg-elevated: #121212;
-            --text-primary: #FFFFFF;
-            --text-secondary: #A1A1AA;
-            --border-color: #27272A;
+            --bg-surface: #080808;
+            --bg-elevated: #151515;
+            --border: #1A1A1A;
         }
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
 
         body {
             width: 360px;
-            max-height: 560px;
-            overflow: hidden;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
-            background: var(--bg-base);
-            color: var(--text-primary);
-            font-family: var(--font-sans);
-            font-size: 13px;
-            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* === HEADER === */
-        header {
+        /* --- Header --- */
+        .header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 16px 20px;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
             background: var(--bg-base);
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
+            position: sticky;
+            top: 0;
             z-index: 10;
         }
 
-        .logo-area {
+        .logo-wrap {
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        .logo-icon {
-            font-size: 18px;
-            line-height: 1;
+            gap: 6px;
         }
 
         .logo-text {
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-        }
-
-        select#theme_selector {
-            appearance: none;
-            background: var(--bg-surface);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-            padding: 4px 10px;
-            border-radius: var(--radius-sm);
-            font-family: var(--font-sans);
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        select#theme_selector:hover {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
             color: var(--text-primary);
-            border-color: var(--text-tertiary);
+            letter-spacing: -0.5px;
         }
 
-        /* === SCROLL AREA === */
-        .scroll-area {
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: transform 0.3s var(--spring), color 0.2s ease, background 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text-primary);
+            background: var(--bg-surface);
+            transform: scale(1.1);
+        }
+
+        /* --- Mode Cards --- */
+        .mode-container {
+            display: flex;
+            gap: 8px;
+            padding: 16px;
+        }
+
+        .mode-card {
             flex: 1;
-            overflow-y: auto;
-            padding: 16px 20px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 200ms var(--spring), border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            align-items: center;
+            gap: 4px;
         }
 
-        .scroll-area::-webkit-scrollbar { width: 4px; }
-        .scroll-area::-webkit-scrollbar-track { background: transparent; }
-        .scroll-area::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        .mode-card:hover {
+            background: var(--bg-elevated);
+        }
 
-        /* === SECTIONS === */
-        .section {
+        .mode-card.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 16px calc(var(--accent) + '33'); /* Simple way to add alpha, we'll assign box-shadow via JS for accurate hex alpha */
+            background: var(--bg-elevated);
+        }
+
+        .mode-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: filter 200ms ease, opacity 200ms ease;
+        }
+
+        .mode-card.active .mode-icon {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+        
+        .mode-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .mode-desc {
+            font-size: 10px;
+            color: var(--text-muted);
+            line-height: 1.2;
+        }
+
+        /* --- Accordions --- */
+        .content-area {
+            flex: 1;
+            padding: 0 16px 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2px;
-        }
-
-        .section-title {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-tertiary);
-        }
-
-        .btn-ghost {
-            background: none;
-            border: none;
-            color: var(--accent-color);
-            font-size: 11px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: var(--radius-sm);
-            transition: background 0.2s;
-        }
-        .btn-ghost:hover { background: var(--bg-elevated); }
-
-        #hw_support_label {
-            display: none;
-            font-size: 11px;
-            line-height: 1.5;
-            padding: 10px 12px;
+        .accordion {
             background: var(--bg-surface);
-            border: 1px dashed var(--border-color);
-            border-radius: var(--radius-md);
-            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color 200ms ease;
         }
 
-        /* === FEATURE LIST === */
-        .feature-item {
+        .acc-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 2px 0;
-            gap: 16px;
+            padding: 14px 16px;
+            cursor: pointer;
+            background: var(--bg-surface);
+            transition: background 200ms ease;
         }
 
-        .feature-info {
-            flex: 1;
+        .acc-header:hover {
+            background: var(--bg-elevated);
+        }
+
+        .acc-title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .acc-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .acc-count {
+            font-size: 11px;
+            color: var(--text-muted);
+            background: var(--bg-base);
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .acc-chevron {
+            color: var(--text-muted);
+            font-size: 12px;
+            transition: transform 200ms ease;
+        }
+
+        .accordion.open .acc-chevron {
+            transform: rotate(180deg);
+        }
+
+        .acc-content {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 300ms ease-out, opacity 250ms ease;
+            background: var(--bg-base);
+        }
+
+        .accordion.open .acc-content {
+            opacity: 1;
+            /* JS will set max-height dynamically */
+        }
+
+        .acc-inner {
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* --- Toggle Cards --- */
+        .toggle-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease;
+        }
+
+        .toggle-card:hover {
+            background: var(--bg-elevated);
+        }
+
+        .toggle-card.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .toggle-info {
             display: flex;
             flex-direction: column;
             gap: 2px;
-        }
-
-        .feature-title {
-            font-size: 12.5px;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .feature-desc {
-            font-size: 10.5px;
-            line-height: 1.3;
-            color: var(--text-secondary);
-        }
-
-        .badge-experimental {
-            font-size: 9px;
-            padding: 1px 5px;
-            background: var(--danger-bg);
-            color: var(--danger-color);
-            border-radius: 4px;
-            font-weight: 600;
-            letter-spacing: 0.02em;
-        }
-
-        /* === SEGMENTED CONTROL === */
-        .segmented-control {
-            display: flex;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            width: 100%;
-        }
-        
-        .segment-btn {
             flex: 1;
-            background: none;
-            border: none;
-            border-right: 1px solid var(--border-color);
-            padding: 7px 0;
-            color: var(--text-secondary);
-            font-family: var(--font-sans);
-            font-size: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            outline: none;
-            text-align: center;
+            padding-right: 12px;
         }
-        
-        .segment-btn:last-child { border-right: none; }
-        
-        .segment-btn:hover:not(.active) { background: rgba(0,0,0,0.05); color: var(--text-primary); }
-        
-        .segment-btn.active {
-            background: var(--accent-color);
-            color: #FFFFFF;
-        }
-        
-        :root[data-theme="dark"] .segment-btn:hover:not(.active),
-        :root[data-theme="amoled"] .segment-btn:hover:not(.active) { background: rgba(255,255,255,0.05); }
 
-        /* === SELECT INPUTS === */
-        .styled-select {
-            appearance: none;
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 5px 24px 5px 10px;
-            border-radius: var(--radius-sm);
-            font-family: var(--font-sans);
-            font-size: 11px;
+        .toggle-title {
+            font-size: 13px;
             font-weight: 500;
-            cursor: pointer;
-            outline: none;
-            width: 100%;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat, repeat;
-            background-position: right .7em top 50%, 0 0;
-            background-size: .65em auto, 100%;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        /* === iOS STYLE SWITCH === */
+        .toggle-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        /* --- iOS Switch --- */
         .switch {
             position: relative;
             display: inline-block;
-            width: 34px;
-            height: 18px;
+            width: 36px;
+            height: 20px;
             flex-shrink: 0;
         }
-        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
         .slider {
-            position: absolute; cursor: pointer;
+            position: absolute;
+            cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--bg-elevated);
-            border: 1px solid var(--border-color);
-            transition: .3s; border-radius: var(--radius-full);
+            background-color: var(--border);
+            transition: .3s var(--spring);
+            border-radius: 20px;
         }
+
         .slider:before {
-            position: absolute; content: "";
-            height: 12px; width: 12px;
-            left: 2px; bottom: 2px;
-            background-color: var(--text-secondary);
-            transition: .3s; border-radius: 50%;
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-muted);
+            transition: .3s var(--spring);
+            border-radius: 50%;
         }
-        input:checked + .slider { background-color: var(--accent-color); border-color: var(--accent-color); }
-        input:checked + .slider:before { background-color: #FFFFFF; transform: translateX(16px); }
 
-        /* === TERMINAL === */
-        .terminal {
-            border-top: 1px solid var(--border-color);
-            background: var(--bg-base);
-            height: 110px;
+        input:checked + .slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .slider:before {
+            background-color: #FFF;
+            transform: translateX(16px);
+        }
+
+        /* --- Pill Segmented Control --- */
+        .seg-control {
             display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
+            background: var(--bg-elevated);
+            border-radius: 9999px;
+            padding: 3px;
+            position: relative;
+            border: 1px solid var(--border);
+            margin-top: 4px;
         }
-        .terminal-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 4px 12px; background: var(--bg-surface);
-            border-bottom: 1px solid var(--border-color);
-        }
-        .terminal-title { font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary); }
-        .terminal-content {
-            padding: 6px 12px; overflow-y: auto; font-family: var(--font-mono);
-            font-size: 10px; background: var(--bg-base); flex: 1;
-        }
-        .t-line { color: var(--text-secondary); }
-        .t-time { color: var(--text-tertiary); margin-right: 6px; }
-        .t-blocked { color: var(--accent-color); }
-        .t-error { color: var(--danger-color); }
 
-        /* === SMART MODE STYLES === */
-        .smart-header {
-            background: var(--bg-surface);
-            padding: 12px 20px;
-            border-bottom: 1px solid var(--border-color);
+        .seg-indicator {
+            position: absolute;
+            top: 3px;
+            bottom: 3px;
+            background: var(--accent);
+            border-radius: 9999px;
+            transition: transform 200ms var(--spring), width 200ms var(--spring);
+            z-index: 1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .seg-item {
+            flex: 1;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+            transition: color 200ms ease;
+        }
+
+        .seg-item.active {
+            color: #FFF;
+        }
+        
+        /* Specific widths for indicators via JS */
+
+        /* --- Slider --- */
+        .slider-cont {
             display: flex;
             align-items: center;
+            gap: 12px;
+            padding: 4px 8px;
+        }
+        .slider-label { font-size: 11px; color: var(--text-muted); width: 60px; }
+        .slider-val { font-size: 11px; color: var(--accent); width: 24px; text-align: right; font-family: 'JetBrains Mono', monospace; }
+        input[type=range] {
+            flex: 1;
+            accent-color: var(--accent);
+            height: 4px;
+            background: var(--bg-elevated);
+            border-radius: 2px;
+            appearance: none;
+            outline: none;
+            cursor: pointer;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            transition: transform 100ms ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+
+        /* --- Status Bar --- */
+        .status-bar {
+            border-top: 1px solid var(--border);
+            padding: 8px 16px;
+            background: var(--bg-base);
+            display: flex;
             justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
         }
         
-        .smart-info { display: flex; flex-direction: column; gap: 1px; }
-        .smart-title { font-size: 12px; font-weight: 600; color: var(--accent-color); display: flex; align-items: center; gap: 4px; }
-        .smart-desc { font-size: 10px; color: var(--text-tertiary); }
-        
-        /* When smart mode is on, we visually fade manual controls */
-        .smart-active .feature-item, 
-        .smart-active .segmented-control,
-        .smart-active .styled-select {
-            opacity: 0.6;
-            pointer-events: none;
+        .status-accent {
+            color: var(--accent);
+            font-weight: 500;
         }
-        
-        .smart-active .section-header .btn-ghost { display: none; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-area">
-            <span class="logo-icon">▶</span>
-            <span class="logo-text">YT Lite</span>
+    <header class="header">
+        <div class="logo-wrap">
+            <span class="logo-text">yt bettr</span>
         </div>
-        <select id="theme_selector">
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-            <option value="amoled">OLED</option>
-        </select>
+        <button class="theme-toggle" id="btn_theme" aria-label="Toggle Theme">🌙</button>
     </header>
 
-    <!-- MODE SELECTION AREA -->
-    <div class="smart-header">
-        <div class="smart-info">
-            <span class="smart-title">🎮 Modo de Operação</span>
-            <span class="smart-desc" id="smart_status">Escolha como o YT Lite deve agir.</span>
+    <div class="mode-container">
+        <div class="mode-card" data-mode="lite" id="mode_lite">
+            <div class="mode-icon">🪶</div>
+            <div class="mode-title">Lite</div>
+            <div class="mode-desc">Bateria & Perf</div>
         </div>
-        <div class="segmented-control" id="group_run_mode" style="width: 180px; margin-top: 0;">
-            <button class="segment-btn" data-val="lite">Lite</button>
-            <button class="segment-btn" data-val="high">High</button>
-            <button class="segment-btn" data-val="custom">Custom</button>
+        <div class="mode-card" data-mode="high" id="mode_high">
+            <div class="mode-icon">💎</div>
+            <div class="mode-title">High</div>
+            <div class="mode-desc">Qualidade Máx</div>
+        </div>
+        <div class="mode-card" data-mode="custom" id="mode_custom">
+            <div class="mode-icon">⚙️</div>
+            <div class="mode-title">Custom</div>
+            <div class="mode-desc">Você decide</div>
         </div>
     </div>
 
-    <div class="scroll-area" id="main_scroll">
-
-        <!-- CODECS -->
-        <div class="section">
-            <div class="section-header">
-                <span class="section-title">📺 Vídeo & Qualidade</span>
-                <button id="btn_detect_hw" class="btn-ghost">Testar GPU</button>
-            </div>
-            
-            <div id="hw_support_label"></div>
-
-            <div class="feature-info">
-                <span class="feature-title">Codecs de Vídeo Permitidos</span>
-                <span class="feature-desc">Ative os formatos que sua placa de vídeo suporta.</span>
-            </div>
-            <div class="segmented-control" id="group_video_codecs">
-                <button class="segment-btn" data-key="block_av1" data-invert="true">AV1</button>
-                <button class="segment-btn" data-key="block_vp9" data-invert="true">VP9</button>
-                <button class="segment-btn" data-key="block_h264" data-invert="true">H.264</button>
-            </div>
-
-            <div class="feature-item" style="margin-top: 4px;">
-                <div class="feature-info">
-                    <span class="feature-title">Resolução Máxima</span>
+    <div class="content-area">
+        
+        <!-- VIDEO ACCORDION -->
+        <div class="accordion" id="acc_video">
+            <div class="acc-header">
+                <div class="acc-title-group">
+                    <span class="acc-title">Vídeo & Codecs</span>
+                    <span class="acc-count" id="count_video">--</span>
                 </div>
-                <div style="width: 100px;">
-                    <select id="feat_max_res" class="styled-select">
-                        <option value="auto">∞ Auto</option>
-                        <option value="1080">1080p</option>
-                        <option value="720">720p</option>
-                        <option value="480">480p</option>
-                        <option value="360">360p</option>
-                        <option value="144">144p</option>
-                    </select>
-                </div>
+                <div class="acc-chevron">▼</div>
             </div>
+            <div class="acc-content">
+                <div class="acc-inner" id="inner_video">
+                    <div class="toggle-card">
+                        <div class="toggle-info">
+                            <span class="toggle-title">📺 Forçar Resolução</span>
+                            <div class="seg-control" id="seg_res">
+                                <div class="seg-indicator" id="ind_res"></div>
+                                <div class="seg-item" data-val="auto">Auto</div>
+                                <div class="seg-item" data-val="480p">480p</div>
+                                <div class="seg-item" data-val="720p">720p</div>
+                                <div class="seg-item" data-val="1080p">1080p</div>
+                                <div class="seg-item" data-val="highest">Max</div>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Taxa de Quadros (FPS)</span>
-                </div>
-                <div class="segmented-control" id="group_max_fps" style="width: 100px;">
-                    <button class="segment-btn" data-val="30">30</button>
-                    <button class="segment-btn" data-val="auto">60</button>
+                    <div class="toggle-card">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🎞️ Codec de Vídeo</span>
+                            <div class="seg-control" id="seg_codec">
+                                <div class="seg-indicator" id="ind_codec"></div>
+                                <div class="seg-item" data-val="av1">AV1</div>
+                                <div class="seg-item" data-val="vp9">VP9</div>
+                                <div class="seg-item" data-val="h264">H.264</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="toggle-card" id="card_60fps">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🚫 Bloquear 60fps</span>
+                            <span class="toggle-desc">Economiza decodificação travando em 30fps.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_block_60fps"><span class="slider"></span></label>
+                    </div>
+
                 </div>
             </div>
         </div>
 
-        <!-- AUDIO -->
-        <div class="section">
-            <div class="section-header"><span class="section-title">🎧 Áudio</span></div>
-            
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Codecs de Áudio</span>
+        <!-- AUDIO ACCORDION -->
+        <div class="accordion" id="acc_audio">
+            <div class="acc-header">
+                <div class="acc-title-group">
+                    <span class="acc-title">Áudio</span>
+                    <span class="acc-count" id="count_audio">--</span>
                 </div>
-                <div class="segmented-control" id="group_audio_codecs" style="width: 120px;">
-                    <button class="segment-btn" data-val="opus">OPUS</button>
-                    <button class="segment-btn" data-val="aac">AAC</button>
+                <div class="acc-chevron">▼</div>
+            </div>
+            <div class="acc-content">
+                <div class="acc-inner" id="inner_audio">
+                    <div class="toggle-card">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🎵 Codec de Áudio</span>
+                            <div class="seg-control" id="seg_audio">
+                                <div class="seg-indicator" id="ind_audio"></div>
+                                <div class="seg-item" data-val="opus">Opus</div>
+                                <div class="seg-item" data-val="mp4a">AAC</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="toggle-card" id="card_ln">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🔊 Remover Limitador</span>
+                            <span class="toggle-desc">Desativa a normalização de volume do YouTube.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_disable_ln"><span class="slider"></span></label>
+                    </div>
+
+                    <div class="toggle-card" id="card_dub">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🗣️ Áudio Original</span>
+                            <span class="toggle-desc">Bloqueia dublagens por IA automaticamente.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_disable_ai_dub"><span class="slider"></span></label>
+                    </div>
                 </div>
-            </div>
-
-            <div class="feature-item">
-                <div class="feature-info"><span class="feature-title">Normalização de Áudio</span></div>
-                <label class="switch"><input type="checkbox" id="feat_disable_ln"><span class="slider"></span></label>
-            </div>
-
-            <div class="feature-item">
-                <div class="feature-info"><span class="feature-title">Dublagem por IA</span></div>
-                <label class="switch"><input type="checkbox" id="feat_disable_ai_dub"><span class="slider"></span></label>
             </div>
         </div>
 
-        <!-- PERFORMANCE -->
-        <div class="section">
-            <div class="section-header"><span class="section-title">⚡ Otimização & UI</span></div>
-
-            <div class="feature-item">
-                <div class="feature-info"><span class="feature-title">Modo Ambiente</span></div>
-                <label class="switch"><input type="checkbox" id="feat_ambient_off"><span class="slider"></span></label>
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-info"><span class="feature-title">Pausar Aba Oculta</span></div>
-                <label class="switch"><input type="checkbox" id="feat_hidden_pause"><span class="slider"></span></label>
-            </div>
-
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Capas em Baixa Resolução</span>
-                    <span class="feature-desc">Carrega miniaturas menores para poupar banda.</span>
+        <!-- OPTIMIZATIONS ACCORDION -->
+        <div class="accordion" id="acc_opt">
+            <div class="acc-header">
+                <div class="acc-title-group">
+                    <span class="acc-title">Otimização & UI</span>
+                    <span class="acc-count" id="count_opt">--</span>
                 </div>
-                <label class="switch"><input type="checkbox" id="feat_thumb_lowres"><span class="slider"></span></label>
+                <div class="acc-chevron">▼</div>
             </div>
+            <div class="acc-content">
+                <div class="acc-inner" id="inner_opt">
+                    
+                    <div class="toggle-card" id="card_thumb_static">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🖼️ Capas Estáticas</span>
+                            <span class="toggle-desc">Desativa previews em vídeo ao passar o mouse.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_thumb_static"><span class="slider"></span></label>
+                    </div>
 
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Remover Transparências</span>
-                    <span class="feature-desc">Desativa efeitos de Blur (Glassmorphism) para fluidez.</span>
+                    <div class="toggle-card" id="card_thumb_low">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🖼️ Capas Básicas</span>
+                            <span class="toggle-desc">Remove previews em alta resolução.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_thumb_lowres"><span class="slider"></span></label>
+                    </div>
+
+                    <div class="toggle-card" id="card_ambient">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🌐 Remover Ambiente</span>
+                            <span class="toggle-desc">Desliga o brilho colorido atrás do player.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_ambient_off"><span class="slider"></span></label>
+                    </div>
+
+                    <div class="toggle-card" id="card_transp">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🪟 Remover Transparência</span>
+                            <span class="toggle-desc">Desativa backdrop-filters pesados.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_no_transparency"><span class="slider"></span></label>
+                    </div>
+
+                    <div class="toggle-card" id="card_eco_ui">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🚀 UI Rápida</span>
+                            <span class="toggle-desc">Remove transições CSS e animações.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_eco_ui"><span class="slider"></span></label>
+                    </div>
+
+                    <div class="toggle-card" id="card_hide_comments">
+                        <div class="toggle-info">
+                            <span class="toggle-title">💬 Esconder Comentários</span>
+                            <span class="toggle-desc">Esconde sessão de comentários e chat.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_hide_comments"><span class="slider"></span></label>
+                    </div>
+
+                    <div class="toggle-card" id="card_hide_shorts">
+                        <div class="toggle-info">
+                            <span class="toggle-title">📱 Esconder Shorts</span>
+                            <span class="toggle-desc">Esconde prateleiras de Shorts.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_hide_shorts"><span class="slider"></span></label>
+                    </div>
+
+                    <div class="toggle-card" id="card_pause">
+                        <div class="toggle-info">
+                            <span class="toggle-title">⏸️ Pausar Aba Oculta</span>
+                            <span class="toggle-desc">Pausa o vídeo ao trocar de aba no navegador.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_hidden_pause"><span class="slider"></span></label>
+                    </div>
+
+                    <div class="toggle-card" id="card_bg_audio">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🎧 Só Áudio em BG</span>
+                            <span class="toggle-desc">Mata vídeo/filtros quando a aba fica escondida.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_bg_audio"><span class="slider"></span></label>
+                    </div>
+
+                    <div class="toggle-card" id="card_exp">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🧪 Bloquear Experimentos</span>
+                            <span class="toggle-desc">Previne testes A/B lerdos do player.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_ab_experiments"><span class="slider"></span></label>
+                    </div>
+
                 </div>
-                <label class="switch"><input type="checkbox" id="feat_no_transparency"><span class="slider"></span></label>
-            </div>
-
-            <div class="feature-item">
-                <div class="feature-info"><span class="feature-title">Eco UI Extremo</span></div>
-                <label class="switch"><input type="checkbox" id="feat_eco_ui"><span class="slider"></span></label>
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-info"><span class="feature-title">Bloquear Experimentos</span></div>
-                <label class="switch"><input type="checkbox" id="feat_ab_experiments"><span class="slider"></span></label>
             </div>
         </div>
 
-        <!-- PREMIUM ENHANCEMENTS -->
-        <div class="section">
-            <div class="section-header">
-                <span class="section-title">✨ Melhorias Premium (High)</span>
-            </div>
-
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Destaque &lt;&gt;</span>
-                    <span class="feature-desc">HDR + Cores vibrantes e profundidade.</span>
+        <!-- PREMIUM ACCORDION -->
+        <div class="accordion" id="acc_premium">
+            <div class="acc-header">
+                <div class="acc-title-group">
+                    <span class="acc-title">Melhorias Premium</span>
+                    <span class="acc-count" id="count_premium">--</span>
                 </div>
-                <label class="switch"><input type="checkbox" id="feat_enhance_hdr"><span class="slider"></span></label>
+                <div class="acc-chevron">▼</div>
             </div>
+            <div class="acc-content">
+                <div class="acc-inner" id="inner_premium">
+                    
+                    <div class="toggle-card" id="card_hdr">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🔆 Destaque de Cor (HDR via CSS)</span>
+                            <span class="toggle-desc">Cores mais vivas sem precisar de monitor HDR.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_enhance_hdr"><span class="slider"></span></label>
+                    </div>
 
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Nitidez /|\</span>
-                    <span class="feature-desc">Filtro de nitidez real via hardware.</span>
-                </div>
-                <label class="switch"><input type="checkbox" id="feat_enhance_sharpness"><span class="slider"></span></label>
-            </div>
+                    <div class="toggle-card" id="card_sharp">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🔪 Nitidez Extra</span>
+                            <span class="toggle-desc">Filtro leve de sharpening via SVG.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_enhance_sharpness"><span class="slider"></span></label>
+                    </div>
 
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Granulação (*)</span>
-                    <span class="feature-desc">Efeito de granulação de filme moderno.</span>
-                </div>
-                <label class="switch"><input type="checkbox" id="feat_enhance_grain"><span class="slider"></span></label>
-            </div>
-            
-            <!-- TEMPORARY SLIDER FOR TESTING -->
-            <div id="grain_slider_cont" style="padding: 0 4px 10px; display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 9px; color: var(--text-tertiary); width: 50px;">Intensidade:</span>
-                <input type="range" id="feat_grain_intensity" min="0" max="100" value="15" style="flex: 1; accent-color: var(--accent-color); height: 4px; cursor: pointer;">
-                <span id="grain_val" style="font-size: 9px; color: var(--accent-color); width: 20px;">15</span>
-            </div>
+                    <div class="toggle-card" id="card_grain">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🎞️ Granulação (Cinema)</span>
+                            <span class="toggle-desc">Ruído sutil para visual analógico/suavizado.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_enhance_grain"><span class="slider"></span></label>
+                    </div>
+                    
+                    <!-- Slider condicional para grain -->
+                    <div id="grain_slider_cont" class="slider-cont" style="display: none;">
+                        <span class="slider-label">Intensidade</span>
+                        <input type="range" id="feat_grain_intensity" min="0" max="100" value="15">
+                        <span id="grain_val" class="slider-val">15</span>
+                    </div>
 
-            <div class="feature-item">
-                <div class="feature-info">
-                    <span class="feature-title">Expansão de Som</span>
-                    <span class="feature-desc">Palco sonoro mais amplo e imersivo.</span>
+                    <div class="toggle-card" id="card_audio_enh">
+                        <div class="toggle-info">
+                            <span class="toggle-title">🔊 Expansão de Som</span>
+                            <span class="toggle-desc">Bass boost e clareza de áudio aprofundada.</span>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="feat_enhance_audio"><span class="slider"></span></label>
+                    </div>
+
                 </div>
-                <label class="switch"><input type="checkbox" id="feat_enhance_audio"><span class="slider"></span></label>
             </div>
         </div>
 
     </div>
 
-    <div class="terminal">
-        <div class="terminal-header">
-            <span class="terminal-title">TELEMETRY_LOGS</span>
-            <button id="btn_copy_logs" class="btn-ghost">Copy</button>
-        </div>
-        <div class="terminal-content" id="log_output"><div class="t-line">Aguardando...</div></div>
-    </div>
+    <footer class="status-bar">
+        <span id="status_mode">Modo: <span class="status-accent">Custom</span></span>
+        <span id="status_codec">Codec: H.264</span>
+        <span>v2.2.0</span>
+    </footer>
 
     <script src="popup.js"></script>
 </body>

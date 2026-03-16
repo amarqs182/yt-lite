@@ -7,7 +7,7 @@
 (function() {
     'use strict';
 
-    if (localStorage['ytl-disable_ai_dub'] !== 'true') return;
+    if (localStorage['ytb-disable_ai_dub'] !== 'true') return;
 
     // We used to hide the Audio Track menu via CSS here, but that broke native
     // features like "Destacar vozes" (Clear Voice).
@@ -37,7 +37,7 @@
 
         if (originalTrack && typeof player.setAudioTrack === 'function') {
             player.setAudioTrack(originalTrack);
-            console.log("YT Lite: Forced Original Audio Track");
+            console.log("yt bettr: Forced Original Audio Track");
         }
     }
 

@@ -5,29 +5,30 @@
  * Syncs storage to DOM attributes.
  */
 
-console.log("YT Lite: Content Script Loaded");
-document.documentElement.setAttribute('data-ytl-cs-loaded', 'true');
+console.log("yt bettr: Content Script Loaded");
+document.documentElement.setAttribute('data-ytb-cs-loaded', 'true');
 
 const keys = [
     'block_av1', 'block_vp9', 'block_h264', 'block_opus',
     'max_res', 'max_fps', 'ambient_off', 'thumb_static',
     'thumb_lowres', 'pause_loops', 'hidden_pause', 'disable_ln',
     'disable_ai_dub', 'eco_ui', 'no_transparency', 'ab_experiments',
+    'hide_comments', 'hide_shorts', 'bg_audio',
     'theme', 'enhance_sharpness', 'enhance_hdr', 'enhance_audio',
     'enhance_grain', 'grain_intensity', 'run_mode'
 ];
 
 const sync = (data) => {
-    console.log("YT Lite: Syncing data to DOM", data);
+    console.log("yt bettr: Syncing data to DOM", data);
     for (const [k, v] of Object.entries(data)) {
-        document.documentElement.setAttribute('data-ytl-' + k, String(v));
+        document.documentElement.setAttribute('data-ytb-' + k, String(v));
     }
-    window.dispatchEvent(new CustomEvent('yt-lite-sync'));
+    window.dispatchEvent(new CustomEvent('yt-bettr-sync'));
 };
 
 chrome.storage.local.get(keys, (stored) => {
     if (chrome.runtime.lastError) {
-        console.error("YT Lite: Storage Error", chrome.runtime.lastError);
+        console.error("yt bettr: Storage Error", chrome.runtime.lastError);
         return;
     }
     sync(stored);

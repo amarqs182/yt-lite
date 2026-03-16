@@ -6,7 +6,7 @@
     'use strict';
     if (window.self !== window.top) return;
 
-    const getS = (k) => document.documentElement.getAttribute('data-ytl-' + k) === 'true';
+    const getS = (k) => document.documentElement.getAttribute('data-ytb-' + k) === 'true';
 
     document.addEventListener('visibilitychange', () => {
         if (document.hidden && getS('hidden_pause')) {

@@ -8,7 +8,7 @@
     'use strict';
     
     if (window.self !== window.top || window.location.href === 'about:blank') return;
-    if (localStorage['ytl-disable_ln'] !== 'true') return;
+    if (localStorage['ytb-disable_ln'] !== 'true') return;
 
     let overrideVideoId = '';
 
@@ -17,21 +17,21 @@
         if (!player) return;
 
         // 1. Monkey-patch setters to prevent YouTube from turning it back on via internal scripts
-        if (typeof player.setOption === 'function' && !player._ytl_ln_patched) {
+        if (typeof player.setOption === 'function' && !player._ytb_ln_patched) {
             const origSetOption = player.setOption;
             player.setOption = function(key, value) {
                 if (key === 'loudnessNormalization') value = false;
                 return origSetOption.call(this, key, value);
             };
-            player._ytl_ln_patched = true;
+            player._ytb_ln_patched = true;
         }
 
-        if (typeof player.setDrcUserPreference === 'function' && !player._ytl_drc_patched) {
+        if (typeof player.setDrcUserPreference === 'function' && !player._ytb_drc_patched) {
             const origSetDrc = player.setDrcUserPreference;
             player.setDrcUserPreference = function(value) {
                 return origSetDrc.call(this, false);
             };
-            player._ytl_drc_patched = true;
+            player._ytb_drc_patched = true;
         }
 
         // 2. Force initialization override exactly once per video ID
@@ -59,15 +59,15 @@
                 player.setVolume(vol);
             }
             
-            console.log("YT Lite: Content Loudness Normalization defeated for video " + currentVideoId);
+            console.log("yt bettr: Content Loudness Normalization defeated for video " + currentVideoId);
         }
     }
 
     // 3. Hook HTML5 Video element natively to catch ad transitions and rapid video changes
     function attachHooks() {
         const video = document.querySelector('video');
-        if (video && !video._ytl_ln_hooked) {
-            video._ytl_ln_hooked = true;
+        if (video && !video._ytb_ln_hooked) {
+            video._ytb_ln_hooked = true;
             video.addEventListener('loadeddata', enforceLoudnessOff);
             video.addEventListener('playing', enforceLoudnessOff);
             video.addEventListener('durationchange', enforceLoudnessOff);

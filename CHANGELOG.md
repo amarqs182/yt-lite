@@ -10,7 +10,7 @@
 - **OLED Mode**: Real pure-black theme support for the YouTube website.
 
 ### Fixed
-- **Pause Bug**: Corrected storage key lookup in `src/features/pause.js` ensuring that `ytl-hidden_pause` (Auto-Pause) and `ytl-pause_loops` (Background Optimization) can now be toggled independently.
+- **Pause Bug**: Corrected storage key lookup in `src/features/pause.js` ensuring that `ytb-hidden_pause` (Auto-Pause) and `ytb-pause_loops` (Background Optimization) can now be toggled independently.
 - **Manifest V3 Validation**: Replaced deprecated `domains` key with `initiatorDomains` and removed unsupported `fetch` resource type in `rules.json` to ensure 100% Chrome compatibility.
 - **Trusted Types Compliance**: Refactored DOM manipulation to avoid `innerHTML`, fixing security blocks on YouTube.
 - **Storage Sync Gap**: Implemented a real-time DOM-attribute bridge to ensure instant settings synchronization between the isolated world and the main world.

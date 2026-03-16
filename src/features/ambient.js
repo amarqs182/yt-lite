@@ -7,7 +7,7 @@
     if (window.self !== window.top) return;
 
     const check = () => {
-        if (document.documentElement.getAttribute('data-ytl-ambient_off') !== 'true') return;
+        if (document.documentElement.getAttribute('data-ytb-ambient_off') !== 'true') return;
         const flexy = document.querySelector('ytd-watch-flexy');
         if (flexy && flexy.hasAttribute('cinematics-active')) {
             flexy.removeAttribute('cinematics-active');
@@ -17,5 +17,5 @@
     };
 
     setInterval(check, 2000);
-    window.addEventListener('yt-lite-sync', check);
+    window.addEventListener('yt-bettr-sync', check);
 })();

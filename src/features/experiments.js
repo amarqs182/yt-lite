@@ -6,7 +6,7 @@
 (function() {
     'use strict';
 
-    if (localStorage['ytl-ab_experiments'] !== 'true') return;
+    if (localStorage['ytb-ab_experiments'] !== 'true') return;
 
     // We need to run very early to intercept yt.config_ before YouTube fully parses it
     let frozen = false;
@@ -32,7 +32,7 @@
                     try {
                         Object.freeze(val.EXPERIMENT_FLAGS);
                         frozen = true;
-                        console.log("YT Lite: A/B Experiment Flags Frozen");
+                        console.log("yt bettr: A/B Experiment Flags Frozen");
                     } catch(e) { }
                 }
                 configValue = val;

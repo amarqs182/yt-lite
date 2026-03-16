@@ -7,7 +7,7 @@
     
     if (window.self !== window.top || window.location.href === 'about:blank') return;
 
-    const getS = (k) => document.documentElement.getAttribute('data-ytl-' + k);
+    const getS = (k) => document.documentElement.getAttribute('data-ytb-' + k);
 
     function isBlocked(type) {
         if (!type) return false;
